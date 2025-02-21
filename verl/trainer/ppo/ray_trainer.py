@@ -911,6 +911,11 @@ class RayPPOTrainer(object):
 
                         # we combine with rule-based rm
                         reward_tensor = self.reward_fn(batch)
+                        
+                        ### Brite-R: Here we modify the reward function
+                        if self.config.algorithm.brite:
+                            reward_tensor *= old_log_prob
+                        
                         batch.batch['token_level_scores'] = reward_tensor
 
                         # compute rewards. apply_kl_penalty if available
