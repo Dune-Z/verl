@@ -19,3 +19,5 @@ vllm<=0.6.3
 wandb
 pytest
 yapf
+pyext
+pylatexenc
