@@ -79,11 +79,12 @@ class PrimeRewardManager:
     The Reward Manager used in https://github.com/PRIME-RL/PRIME
     """
 
-    def __init__(self, tokenizer, num_examine, compute_score=None) -> None:
+    def __init__(self, tokenizer, num_examine, compute_score=None, offset = 0, scale = 1.) -> None:
         self.tokenizer = tokenizer
         self.num_examine = num_examine  # the number of batches of decoded responses to print to the console
         self.compute_score = compute_score or _default_compute_score
-
+        self.scale = scale
+        self.offset = offset
     def __call__(self, data: DataProto):
         """We will expand this function gradually based on the available datasets"""
 
@@ -122,7 +123,7 @@ class PrimeRewardManager:
 
         for i in range(len(data)):
             data_source = data_sources[i]
-            reward_tensor[i, valid_response_length[i].item() - 1] = scores[i]
+            reward_tensor[i, valid_response_length[i].item() - 1] = self.scale * scores[i] + self.offset
 
             if data_source not in already_print_data_sources:
                 already_print_data_sources[data_source] = 0

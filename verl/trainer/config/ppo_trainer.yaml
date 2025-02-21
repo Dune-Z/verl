@@ -152,6 +152,8 @@ algorithm:
     type: fixed
     kl_coef: 0.001
   brite: 0
+  reward_scale: 1.
+  reward_offset: 0.
 
 trainer:
   total_epochs: 30
