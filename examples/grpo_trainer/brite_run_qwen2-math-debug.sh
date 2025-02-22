@@ -1,5 +1,5 @@
-#set -x
-export CUDA_VISIBLE_DEVICES=6,7,8,9
+set -x
+export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
 
 ### task name can be selected from [gsm8k, math_dataset, opencoder]
 TASK_NAME=prime
@@ -24,8 +24,6 @@ fi
 
 export HYDRA_FULL_ERROR=1
 export VLLM_ATTENTION_BACKEND=XFORMERS
-# yifei's key
-export WANDB_API_KEY=d61cd005c38e0e1e27d921c951303410316ac718
 python3 -m verl.trainer.main_ppo \
     algorithm.brite=1. \
     reward_model.reward_manager=prime \
@@ -60,11 +58,11 @@ python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.ref.fsdp_config.param_offload=True \
     algorithm.kl_ctrl.kl_coef=0.001 \
     trainer.critic_warmup=0 \
-    trainer.logger=['console','wandb'] \
+    trainer.logger=['console'] \
     trainer.project_name=${PROJECT_NAME} \
     trainer.experiment_name=${EXPERIMENT_NAME} \
     trainer.default_local_dir=${SAVE_LOCAL_DIR} \
-    trainer.n_gpus_per_node=4 \
+    trainer.n_gpus_per_node=8 \
     trainer.nnodes=1 \
     trainer.save_freq=25 \
     trainer.test_freq=25 \
