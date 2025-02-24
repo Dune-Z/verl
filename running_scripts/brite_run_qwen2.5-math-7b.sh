@@ -27,7 +27,7 @@ export VLLM_ATTENTION_BACKEND=XFORMERS
 export WANDB_API_KEY=d61cd005c38e0e1e27d921c951303410316ac718
 python3 -m verl.trainer.main_ppo \
     algorithm.brite=True \
-    algorithm.truncate_reward=0.1 \
+    algorithm.logp_beta=1 \
     algorithm.reward_scale=1. \
     algorithm.reward_offset=-1. \
     algorithm.adv_estimator=grpo \
