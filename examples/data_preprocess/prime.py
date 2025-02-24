@@ -33,7 +33,7 @@ def main():
     parser.add_argument('--local_dir', default='~/data/math')
     parser.add_argument('--hdfs_dir', default=None)
     parser.add_argument("--sample_start_idx", default=0, type=int)
-    parser.add_argument("--sample_end_idx", default=99999999, type=int)
+    parser.add_argument("--sample_end_idx", default=999999999, type=int)
     parser.add_argument("--data_remote_dir",default = 'OpenCoder-LLM/opc-sft-stage2',type = str)
     args = parser.parse_args()
 
@@ -47,7 +47,7 @@ def main():
 
     if file_path.exists() and file_path.suffix == ".parquet":
         print("file existed")
-        return 
+        #return 
     dataset = datasets.load_dataset(data_source, trust_remote_code=True)
 
     train_dataset = dataset['train']

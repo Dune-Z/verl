@@ -151,10 +151,10 @@ algorithm:
   kl_ctrl:
     type: fixed
     kl_coef: 0.001
-  brite: 0
+  brite: False
   reward_scale: 1.
   reward_offset: 0.
-
+  truncate_reward: 0.1
 trainer:
   total_epochs: 30
   total_training_steps: null

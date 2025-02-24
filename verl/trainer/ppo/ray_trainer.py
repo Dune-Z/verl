@@ -914,9 +914,11 @@ class RayPPOTrainer(object):
                         
                         ### Brite-R: Here we modify the reward function
                         if self.config.algorithm.brite:
+                            reward_tensor = torch.clamp(reward_tensor, min = self.config.algorithm.truncate_reward)
+                            truncate_index = torch.where(reward_tensor < self.config.algorithm.truncate_reward)
+                            reward_tensor = 1./reward_tensor
                             reward_tensor *= old_log_prob.batch['old_log_probs']
-                            reward_tensor[reward_tensor == 0] = -10
-                        
+                            reward_tensor[truncate_index] = -1./self.config.algorithm.truncate_reward
                         batch.batch['token_level_scores'] = reward_tensor
 
                         # compute rewards. apply_kl_penalty if available
