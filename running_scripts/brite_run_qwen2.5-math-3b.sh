@@ -1,5 +1,5 @@
 #set -x
-#export CUDA_VISIBLE_DEVICES=6,7,8,9
+export CUDA_VISIBLE_DEVICES=2,3,4,5,6,7,8,9
 
 ### task name can be selected from [gsm8k, math_dataset, opencoder]
 TASK_NAME=prime
@@ -7,8 +7,8 @@ TASK_NAME=prime
  
 REMOTE_DATA_PATH=PRIME-RL/Eurus-2-RL-Data
 SAVE_LOCAL_DIR_PREFIX='checkpoints/'
-PROJECT_NAME=Qwen2.5-Math-3B-Instruct
-MODEL_NAME=Qwen/Qwen2.5-Math-3B-Instruct
+PROJECT_NAME=Qwen2.5-1.5B-Instruct
+MODEL_NAME=Qwen/Qwen2.5-1.5B-Instruct
 EXPERIMENT_NAME=Brite-vanilla-0.1
 SAVE_LOCAL_DIR=${SAVE_LOCAL_DIR_PREFIX}${PROJECT_NAME}/${EXPERIMENT_NAME}
 
@@ -54,7 +54,7 @@ python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.rollout.gpu_memory_utilization=0.6 \
     actor_rollout_ref.rollout.n=5 \
     actor_rollout_ref.actor.use_dynamic_bsz=True \
-    actor_rollout_ref.actor.ppo_max_token_len_per_gpu=24000 \
+    actor_rollout_ref.actor.ppo_max_token_len_per_gpu=12000 \
     actor_rollout_ref.ref.fsdp_config.param_offload=True \
     algorithm.kl_ctrl.kl_coef=0.001 \
     trainer.critic_warmup=0 \
