@@ -8,7 +8,7 @@ TASK_NAME=prime
 REMOTE_DATA_PATH=PRIME-RL/Eurus-2-RL-Data
 SAVE_LOCAL_DIR_PREFIX='checkpoints/'
 PROJECT_NAME=Qwen2.5-Math-7B-Instruct
-MODEL_NAME=Qwen/Qwen2.5-Math-3B-Instruct
+MODEL_NAME=Qwen/Qwen2.5-Math-7B-Instruct
 EXPERIMENT_NAME=baseline
 SAVE_LOCAL_DIR=${SAVE_LOCAL_DIR_PREFIX}${PROJECT_NAME}/${EXPERIMENT_NAME}
 
@@ -26,7 +26,6 @@ export VLLM_ATTENTION_BACKEND=XFORMERS
 # yifei's key
 export WANDB_API_KEY=d61cd005c38e0e1e27d921c951303410316ac718
 python3 -m verl.trainer.main_ppo \
-    algorithm.brite=0 \
     algorithm.reward_scale=1. \
     algorithm.reward_offset=-1. \
     algorithm.adv_estimator=grpo \
