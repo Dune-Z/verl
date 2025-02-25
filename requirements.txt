@@ -10,11 +10,11 @@ peft
 pyarrow>=15.0.0
 pybind11
 pylatexenc
+pytest
+pyext
 ray[data,train,tune,serve]
 tensordict
 transformers
 vllm==0.6.3
 wandb
-pytest
 yapf
-pyext

@@ -2,24 +2,20 @@
 
 ## Installation
 
-Install `uv` via [UV Installation Guide](https://docs.astral.sh/uv/getting-started/installation/).  
+Install `uv` in BRiTER verl directory. [UV Installation Guide](https://docs.astral.sh/uv/getting-started/installation/).  
 
 ```sh
+git clone https://github.com/Dune-Z/verl.git && cd verl
 uv venv briter --python 3.11 && source briter/bin/activate && uv pip install --upgrade pip --link-mode=copy
 ```
 
-Next, install vllm
+Then install the rest of the dependencies.
 
-```sh
-uv pip install vllm==0.7.1 --link-mode=copy
-```
-
-This will also install PyTorch `v2.5.1` and it is very important to use this version since the `vLLM` binaries are compiled for it. Then install the rest of the dependencies by running the following command:
 ```sh
 uv pip install -r requirements.txt --link-mode=copy
 ```
 
-At last, install `flash_attn` by running the following command:
+At last, install `flash_attn`.
 
 ```sh
 uv pip install flash_attn --no-build-isolation --link-mode=copy
