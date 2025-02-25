@@ -1,4 +1,4 @@
-#set -x
+# set -x
 export CUDA_VISIBLE_DEVICES=2,3,4,5,6,7,8,9
 
 ### task name can be selected from [gsm8k, math_dataset, opencoder]
@@ -15,10 +15,10 @@ SAVE_LOCAL_DIR=${SAVE_LOCAL_DIR_PREFIX}${PROJECT_NAME}/${EXPERIMENT_NAME}
 ### preprocess the dataset
 if [ -z "${START_IDX:-}" ]; then
     DATA_PATH_SUFF=${TASK_NAME}
-    python3 examples/data_preprocess/${TASK_NAME}.py --local_dir $HOME/data/$DATA_PATH_SUFF --data_remote_dir $REMOTE_DATA_PATH
+    python3 data_preprocess/${TASK_NAME}.py --local_dir $HOME/data/$DATA_PATH_SUFF --data_remote_dir $REMOTE_DATA_PATH
 else
     DATA_PATH_SUFF=${TASK_NAME}_${START_IDX}_${END_IDX}
-    python3 examples/data_preprocess/${TASK_NAME}.py --local_dir $HOME/data/$DATA_PATH_SUFF --sample_start_idx $START_IDX --sample_end_idx $END_IDX --data_remote_dir $REMOTE_DATA_PATH
+    python3 data_preprocess/${TASK_NAME}.py --local_dir $HOME/data/$DATA_PATH_SUFF --sample_start_idx $START_IDX --sample_end_idx $END_IDX --data_remote_dir $REMOTE_DATA_PATH
 fi
 
 export HYDRA_FULL_ERROR=1

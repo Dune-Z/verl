@@ -1,9 +1,7 @@
-# requirements.txt records the full set of dependencies for development
 accelerate
 codetiming
 datasets
 dill
-flash-attn
 hydra-core
 liger-kernel
 numpy
@@ -13,11 +11,10 @@ pyarrow>=15.0.0
 pybind11
 pylatexenc
 ray[data,train,tune,serve]
-tensordict<0.6
+tensordict
 transformers
-vllm<=0.6.3
+vllm==0.6.3
 wandb
 pytest
 yapf
 pyext
-pylatexenc
