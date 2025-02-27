@@ -267,7 +267,7 @@ class DataParallelPPOActor(BasePPOActor):
                     metrics['actor/kl_loss'] = kl_loss.detach().item()
                     metrics['actor/kl_coef'] = self.config.kl_loss_coef
                 if self.config.sft_loss_coef > 1e-8:
-                    sft_loss -= self.config.sft_loss_coef * masked_mean(log_prob)
+                    sft_loss = - self.config.sft_loss_coef * masked_mean(log_prob)
                     policy_loss = policy_loss + sft_loss
                 if self.config.use_dynamic_bsz:
                     # relative to the dynamic bsz
