@@ -7,8 +7,8 @@ TASK_NAME=prime
 sft_loss_coef=0.02
 REMOTE_DATA_PATH=PRIME-RL/Eurus-2-RL-Data
 SAVE_LOCAL_DIR_PREFIX='checkpoints/'
-PROJECT_NAME=Qwen2.5-Math-7B-Instruct
-MODEL_NAME=Qwen/Qwen2.5-Math-7B-Instruct
+PROJECT_NAME=Qwen2.5-Math-7B
+MODEL_NAME=Qwen/Qwen2.5-Math-7B
 EXPERIMENT_NAME=Brite-sft_loss-coef${sft_loss_coef}
 SAVE_LOCAL_DIR=${SAVE_LOCAL_DIR_PREFIX}${PROJECT_NAME}/${EXPERIMENT_NAME}
 
