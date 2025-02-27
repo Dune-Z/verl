@@ -26,7 +26,7 @@ export VLLM_ATTENTION_BACKEND=XFORMERS
 # yifei's key
 export WANDB_API_KEY=d61cd005c38e0e1e27d921c951303410316ac718
 python3 -m verl.trainer.main_ppo \
-    actor.sft_loss_coef=${sft_loss_coef} \
+    actor_rollout_ref.actor.sft_loss_coef=${sft_loss_coef} \
     algorithm.reward_scale=1. \
     algorithm.reward_offset=-1. \
     algorithm.adv_estimator=grpo \
