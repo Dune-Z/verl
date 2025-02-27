@@ -1,5 +1,5 @@
 #set -x
-#export CUDA_VISIBLE_DEVICES=6,7,8,9
+# export CUDA_VISIBLE_DEVICES=1,2,3,4,5,6,7,8
 
 ### task name can be selected from [gsm8k, math_dataset, opencoder]
 TASK_NAME=prime
@@ -36,7 +36,7 @@ python3 -m verl.trainer.main_ppo \
     data.train_batch_size=1024 \
     data.val_batch_size=1024 \
     data.max_prompt_length=1024 \
-    data.max_response_length=4096 \
+    data.max_response_length=3000 \
     actor_rollout_ref.model.path=${MODEL_NAME} \
     actor_rollout_ref.actor.optim.lr=5e-7 \
     actor_rollout_ref.model.use_remove_padding=True \
