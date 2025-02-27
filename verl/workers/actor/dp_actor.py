@@ -275,14 +275,21 @@ class DataParallelPPOActor(BasePPOActor):
                 else:
                     loss = policy_loss / self.gradient_accumulation
                 loss.backward()
-
-                data = {
-                    'actor/entropy_loss': entropy_loss.detach().item(),
-                    'actor/pg_loss': pg_loss.detach().item(),
-                    'actor/pg_clipfrac': pg_clipfrac.detach().item(),
-                    'actor/ppo_kl': ppo_kl.detach().item(),
-                    'actor/sft_loss': sft_loss.detach().item()
-                }
+                if self.config.sft_loss_coef > 1e-8:
+                    data = {
+                        'actor/entropy_loss': entropy_loss.detach().item(),
+                        'actor/pg_loss': pg_loss.detach().item(),
+                        'actor/pg_clipfrac': pg_clipfrac.detach().item(),
+                        'actor/ppo_kl': ppo_kl.detach().item(),
+                        'actor/sft_loss': sft_loss.detach().item()
+                    }
+                else:
+                    data = {
+                        'actor/entropy_loss': entropy_loss.detach().item(),
+                        'actor/pg_loss': pg_loss.detach().item(),
+                        'actor/pg_clipfrac': pg_clipfrac.detach().item(),
+                        'actor/ppo_kl': ppo_kl.detach().item()
+                    }
                 append_to_dict(metrics, data)
 
             grad_norm = self._optimizer_step()
