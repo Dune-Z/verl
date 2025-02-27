@@ -4,21 +4,21 @@
 ### task name can be selected from [gsm8k, math_dataset, opencoder]
 TASK_NAME=prime
 # comment START_IDX and END_IDX if you want to use the whole dataset for the training
- 
+sft_loss_coef=0.002
 REMOTE_DATA_PATH=PRIME-RL/Eurus-2-RL-Data
 SAVE_LOCAL_DIR_PREFIX='checkpoints/'
 PROJECT_NAME=Qwen2.5-Math-7B-Instruct
-MODEL_NAME=Qwen/Qwen2.5-Math-3B-Instruct
-EXPERIMENT_NAME=baseline
+MODEL_NAME=Qwen/Qwen2.5-Math-7B-Instruct
+EXPERIMENT_NAME=Brite-sft_loss-coef${sft_loss_coef}
 SAVE_LOCAL_DIR=${SAVE_LOCAL_DIR_PREFIX}${PROJECT_NAME}/${EXPERIMENT_NAME}
 
 ### preprocess the dataset
 if [ -z "${START_IDX:-}" ]; then
     DATA_PATH_SUFF=${TASK_NAME}
-    python3 examples/data_preprocess/${TASK_NAME}.py --local_dir $HOME/data/$DATA_PATH_SUFF --data_remote_dir $REMOTE_DATA_PATH
+    python3 data_preprocess/${TASK_NAME}.py --local_dir $HOME/data/$DATA_PATH_SUFF --data_remote_dir $REMOTE_DATA_PATH
 else
     DATA_PATH_SUFF=${TASK_NAME}_${START_IDX}_${END_IDX}
-    python3 examples/data_preprocess/${TASK_NAME}.py --local_dir $HOME/data/$DATA_PATH_SUFF --sample_start_idx $START_IDX --sample_end_idx $END_IDX --data_remote_dir $REMOTE_DATA_PATH
+    python3 data_preprocess/${TASK_NAME}.py --local_dir $HOME/data/$DATA_PATH_SUFF --sample_start_idx $START_IDX --sample_end_idx $END_IDX --data_remote_dir $REMOTE_DATA_PATH
 fi
 
 export HYDRA_FULL_ERROR=1
@@ -26,6 +26,7 @@ export VLLM_ATTENTION_BACKEND=XFORMERS
 # yifei's key
 export WANDB_API_KEY=d61cd005c38e0e1e27d921c951303410316ac718
 python3 -m verl.trainer.main_ppo \
+    actor.sft_loss_coef=${sft_loss_coef} \
     algorithm.reward_scale=1. \
     algorithm.reward_offset=-1. \
     algorithm.adv_estimator=grpo \
@@ -36,7 +37,7 @@ python3 -m verl.trainer.main_ppo \
     data.train_batch_size=1024 \
     data.val_batch_size=1024 \
     data.max_prompt_length=1024 \
-    data.max_response_length=3072 \
+    data.max_response_length=4096 \
     actor_rollout_ref.model.path=${MODEL_NAME} \
     actor_rollout_ref.actor.optim.lr=5e-7 \
     actor_rollout_ref.model.use_remove_padding=True \

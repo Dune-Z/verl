@@ -177,7 +177,7 @@ class DataParallelPPOActor(BasePPOActor):
 
         select_keys = ['responses', 'input_ids', 'attention_mask', 'position_ids']
         batch = data.select(batch_keys=select_keys).batch
-
+        #if self.config.algorithm.sft_regularizer_coeff
         if use_dynamic_bsz:
             # split using dynamic bsz
             max_token_len = data.meta_info['max_token_len'] * self.ulysses_sequence_parallel_size
@@ -266,7 +266,9 @@ class DataParallelPPOActor(BasePPOActor):
                     policy_loss = policy_loss + kl_loss * self.config.kl_loss_coef
                     metrics['actor/kl_loss'] = kl_loss.detach().item()
                     metrics['actor/kl_coef'] = self.config.kl_loss_coef
-
+                if self.config.sft_loss_coef > 1e-8:
+                    sft_loss -= self.config.sft_loss_coef * masked_mean(log_prob)
+                    policy_loss = policy_loss + sft_loss
                 if self.config.use_dynamic_bsz:
                     # relative to the dynamic bsz
                     loss = policy_loss * (len(data) / self.config.ppo_mini_batch_size)
@@ -279,6 +281,7 @@ class DataParallelPPOActor(BasePPOActor):
                     'actor/pg_loss': pg_loss.detach().item(),
                     'actor/pg_clipfrac': pg_clipfrac.detach().item(),
                     'actor/ppo_kl': ppo_kl.detach().item(),
+                    'actor/sft_loss': sft_loss.detach().item()
                 }
                 append_to_dict(metrics, data)
 
