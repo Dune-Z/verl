@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import asyncio
-from concurrent.futures import ProcessPoolExecutor
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 from functools import partial
 
 import torch
@@ -113,7 +113,7 @@ class PrimeRewardManager:
                                              sequences_str,
                                              ground_truth,
                                              data_sources,
-                                             num_processes=64))
+                                             num_processes=32))
         except asyncio.TimeoutError as e:
             print('Global timeout in reward computing! Setting all as 0.')
             scores = [0. for _ in range(len(sequences_str))]
