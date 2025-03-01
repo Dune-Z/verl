@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import asyncio
-from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
 from functools import partial
 
 import torch
@@ -22,56 +22,109 @@ from verl import DataProto
 from verl.utils.reward_score import _default_compute_score
 
 
-async def single_compute_score(evaluation_func, completion, reference, task, executor, timeout=300.):
+async def single_compute_score(evaluation_func, completion, reference, task, timeout=300.):
     loop = asyncio.get_running_loop()
-    try:
-        # Ensure process_completion is called properly
-        tasks = [
-            asyncio.wait_for(
-                loop.run_in_executor(
-                    executor,
-                    partial(evaluation_func, task, completion, reference)  # Ensure synchronous
-                ),
-                timeout=timeout)
-        ]
-        return await asyncio.gather(*tasks)
-    except asyncio.TimeoutError:
-        print(f"Timeout occurred for completion: {completion}")
-        return None  # Default value for timed-out rows
-    except Exception as e:
-        print(f"Error processing completion: {completion[:10]}, Error: {e}")
-        return None  # Default value for failed rows
-
-
-async def parallel_compute_score_async(evaluation_func, completions, references, tasks, num_processes=64):
-    scores = []
-    with ProcessPoolExecutor(max_workers=num_processes) as executor:
-        # Create tasks for all rows
-        tasks_async = [
-            single_compute_score(evaluation_func, completion, reference, task, executor, timeout=300.)
-            for completion, reference, task in zip(completions, references, tasks)
-        ]
-        # to prevent very occasional starvation caused by some anomalous programs ( like infinite loop ), the exceptions in async programs will instantly halt the evaluation, and all summoned processes will be killed.
+    
+    with ThreadPoolExecutor(max_workers=1) as thread_executor:
         try:
-            results = await asyncio.gather(*tasks_async, return_exceptions=False)
-        except:
-            for pid, proc in executor._processes.items():
-                try:
-                    proc.kill()
-                except Exception as kill_err:
-                    print('shut down failed: ' + str(kill_err))
-            raise
+            return await asyncio.wait_for(
+                loop.run_in_executor(
+                    thread_executor, partial(evaluation_func, task, completion, reference)
+                ),
+                timeout=timeout
+            )
+        except asyncio.TimeoutError:
+            print(f"Timeout occurred for completion: {completion[:10]}")
+            return None
+        except Exception as e:
+            print(f"Error processing completion: {completion[:10]}, Error: {e}")
+            return None
 
-    # Process results
-    for result, completion, reference, task in zip(results, completions, references, tasks):
-        if isinstance(result, Exception) or result is None:
-            # Handle failed or timed-out tasks
-            scores.append(0.0)
-        elif isinstance(result[0], (int, float, bool)):
-            scores.append(float(result[0]))
-        else:
-            scores.append(float(result[0][0]))
+
+async def parallel_compute_score_async(evaluation_func, completions, references, tasks, num_processes=32):
+    scores = []
+    
+    with ProcessPoolExecutor(max_workers=num_processes) as executor:
+        futures = {
+            executor.submit(evaluation_func, task, completion, reference): (completion, reference, task)
+            for completion, reference, task in zip(completions, references, tasks)
+        }
+        
+        try:
+            for future in as_completed(futures, timeout=300):  # Enforce global timeout
+                completion, reference, task = futures[future]
+                try:
+                    result = future.result(timeout=300)  # Per-task timeout
+                    if isinstance(result, (int, float, bool)):
+                        scores.append(float(result))
+                    elif isinstance(result, (list, tuple)) and isinstance(result[0], (int, float, bool)):
+                        scores.append(float(result[0]))
+                    else:
+                        scores.append(0.0)
+                except asyncio.TimeoutError:
+                    print(f"Timeout occurred for completion: {completion[:10]}")
+                    scores.append(0.0)
+                except Exception as e:
+                    print(f"Error processing completion: {completion[:10]}, Error: {e}")
+                    scores.append(0.0)
+        except Exception as global_error:
+            print(f"Global error encountered: {global_error}. Terminating all processes.")
+            executor.shutdown(wait=False, cancel_futures=True)
+            scores = [0.0] * len(completions)
+
     return scores
+
+
+# async def single_compute_score(evaluation_func, completion, reference, task, executor, timeout=300.):
+#     loop = asyncio.get_running_loop()
+#     try:
+#         # Ensure process_completion is called properly
+#         tasks = [
+#             asyncio.wait_for(
+#                 loop.run_in_executor(
+#                     executor,
+#                     partial(evaluation_func, task, completion, reference)  # Ensure synchronous
+#                 ),
+#                 timeout=timeout)
+#         ]
+#         return await asyncio.gather(*tasks)
+#     except asyncio.TimeoutError:
+#         print(f"Timeout occurred for completion: {completion}")
+#         return None  # Default value for timed-out rows
+#     except Exception as e:
+#         print(f"Error processing completion: {completion[:10]}, Error: {e}")
+#         return None  # Default value for failed rows
+
+
+# async def parallel_compute_score_async(evaluation_func, completions, references, tasks, num_processes=64):
+#     scores = []
+#     with ProcessPoolExecutor(max_workers=num_processes) as executor:
+#         # Create tasks for all rows
+#         tasks_async = [
+#             single_compute_score(evaluation_func, completion, reference, task, executor, timeout=300.)
+#             for completion, reference, task in zip(completions, references, tasks)
+#         ]
+#         # to prevent very occasional starvation caused by some anomalous programs ( like infinite loop ), the exceptions in async programs will instantly halt the evaluation, and all summoned processes will be killed.
+#         try:
+#             results = await asyncio.gather(*tasks_async, return_exceptions=False)
+#         except:
+#             for pid, proc in executor._processes.items():
+#                 try:
+#                     proc.kill()
+#                 except Exception as kill_err:
+#                     print('shut down failed: ' + str(kill_err))
+#             raise
+
+#     # Process results
+#     for result, completion, reference, task in zip(results, completions, references, tasks):
+#         if isinstance(result, Exception) or result is None:
+#             # Handle failed or timed-out tasks
+#             scores.append(0.0)
+#         elif isinstance(result[0], (int, float, bool)):
+#             scores.append(float(result[0]))
+#         else:
+#             scores.append(float(result[0][0]))
+#     return scores
 
 
 class PrimeRewardManager:

@@ -32,6 +32,7 @@ def main():
     parser.add_argument("--sample_start_idx", default=0, type=int)
     parser.add_argument("--sample_end_idx", default=999999999, type=int)
     parser.add_argument("--data_remote_dir",default = 'OpenCoder-LLM/opc-sft-stage2',type = str)
+    parser.add_argument("--math_only", default=False)
     args = parser.parse_args()
 
     # 'lighteval/MATH' is no longer available on huggingface.
@@ -51,6 +52,9 @@ def main():
     train_dataset = train_dataset.select(range(args.sample_start_idx, min(args.sample_end_idx, len(train_dataset)) ))
     test_dataset = dataset['validation']
     test_dataset = test_dataset.select(range(0, min(args.sample_end_idx, len(test_dataset)) ))
+    if args.math_only:
+        train_dataset = train_dataset.filter(lambda x: x['ability'] == 'math')
+        test_dataset = test_dataset.filter(lambda x: x['ability'] == 'math')
     #instruction_following = "Let's think step by step and output the final answer within \\boxed{}."
 
     # add a row to each data item that represents a unique id
