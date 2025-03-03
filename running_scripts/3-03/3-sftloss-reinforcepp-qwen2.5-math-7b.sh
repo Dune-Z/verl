@@ -5,7 +5,7 @@
 TASK_NAME=prime
 MATH_ONLY=True
 # comment START_IDX and END_IDX if you want to use the whole dataset for the training
-sft_loss_coef=0.5
+sft_loss_coef=0.2
 REMOTE_DATA_PATH=PRIME-RL/Eurus-2-RL-Data
 SAVE_LOCAL_DIR_PREFIX='checkpoints/'
 PROJECT_NAME=Qwen2.5-Math-7B
