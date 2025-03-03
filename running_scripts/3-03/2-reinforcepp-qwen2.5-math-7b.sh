@@ -29,7 +29,7 @@ export WANDB_API_KEY=d61cd005c38e0e1e27d921c951303410316ac718
 python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.actor.sft_loss_coef=${sft_loss_coef} \
     algorithm.reward_scale=1. \
-    algorithm.reward_offset=-1. \
+    algorithm.reward_offset=0 \
     algorithm.adv_estimator=reinforce_plus_plus \
     reward_model.reward_manager=prime \
     data.custom_temp_dir=$HOME/tmp/ray/  \
