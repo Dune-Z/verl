@@ -53,8 +53,7 @@ class DataParallelPPOActor(BasePPOActor):
         self.ulysses_sequence_parallel_size = self.config.ulysses_sequence_parallel_size
         self.use_ulysses_sp = self.ulysses_sequence_parallel_size > 1
 
-        # self.compute_entropy_from_logits = torch.compile(verl_F.entropy_from_logits, dynamic=True)
-        self.compute_entropy_from_logits = verl_F.entropy_from_logits
+        self.compute_entropy_from_logits = torch.compile(verl_F.entropy_from_logits, dynamic=True)
 
     def _forward_micro_batch(self, micro_batch, temperature) -> Tuple[torch.Tensor, torch.Tensor]:
         """
