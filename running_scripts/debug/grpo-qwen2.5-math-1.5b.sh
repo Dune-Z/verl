@@ -1,26 +1,33 @@
-#set -x
-export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
+export WANDB_API_KEY=d61cd005c38e0e1e27d921c951303410316ac718
+wandb login --relogin $WANDB_API_KEY
 
-### task name can be selected from [gsm8k, math_dataset, opencoder]
-TASK_NAME=prime
-MATH_ONLY=True
+TASK_NAMES=("prime" "math500")
 # comment START_IDX and END_IDX if you want to use the whole dataset for the training
-sft_loss_coef=0.2
+sft_loss_coef=0
 REMOTE_DATA_PATH=PRIME-RL/Eurus-2-RL-Data
 SAVE_LOCAL_DIR_PREFIX='checkpoints/'
 PROJECT_NAME=Qwen2.5-Math-1.5B
-MODEL_NAME=Qwen/Qwen2.5-1.5B
-EXPERIMENT_NAME=DEBUG-grpo
+MODEL_NAME=Qwen/Qwen2.5-Math-1.5B
+EXPERIMENT_NAME=ppo
 SAVE_LOCAL_DIR=${SAVE_LOCAL_DIR_PREFIX}${PROJECT_NAME}/${EXPERIMENT_NAME}
 
 ### preprocess the dataset
-if [ -z "${START_IDX:-}" ]; then
-    DATA_PATH_SUFF=${TASK_NAME}_${MATH_ONLY}
-    python3 data_preprocess/${TASK_NAME}.py --local_dir $HOME/data/$DATA_PATH_SUFF --data_remote_dir $REMOTE_DATA_PATH --math_only $MATH_ONLY
-else
-    DATA_PATH_SUFF=${TASK_NAME}_${START_IDX}_${END_IDX}_${MATH_ONLY}
-    python3 data_preprocess/${TASK_NAME}.py --local_dir $HOME/data/$DATA_PATH_SUFF --sample_start_idx $START_IDX --sample_end_idx $END_IDX --data_remote_dir $REMOTE_DATA_PATH --math_only $MATH_ONLY
-fi
+DATA_PATHS=()
+for TASK_NAME in "${TASK_NAMES[@]}"; do
+    echo "Processing task: $TASK_NAME"
+    
+    if [ -z "${START_IDX:-}" ]; then
+        DATA_PATH_SUFF=${TASK_NAME}
+        python3 data_preprocess/${TASK_NAME}.py --local_dir ./data/$DATA_PATH_SUFF --data_remote_dir $REMOTE_DATA_PATH
+    else
+        DATA_PATH_SUFF=${TASK_NAME}_${START_IDX}_${END_IDX}
+        python3 data_preprocess/${TASK_NAME}.py --local_dir ./data/$DATA_PATH_SUFF --sample_start_idx $START_IDX --sample_end_idx $END_IDX --data_remote_dir $REMOTE_DATA_PATH
+    fi
+    DATA_PATHS+=("./data/$DATA_PATH_SUFF")
+done
+echo "Combined tasks: ${TASK_NAMES[@]}"
+python3 data_preprocess/combine_parquet.py --data_dirs ${DATA_PATHS[@]} --output_dir ./data/combined
+python3 data_preprocess/combine_parquet.py --data_dirs ./data/prime --output_dir ./data/combined --split train
 
 export HYDRA_FULL_ERROR=1
 export VLLM_ATTENTION_BACKEND=XFORMERS
@@ -32,8 +39,8 @@ python3 -m verl.trainer.main_ppo \
     algorithm.adv_estimator=grpo \
     reward_model.reward_manager=prime \
     data.custom_temp_dir=$HOME/tmp/ray/  \
-    data.train_files=$HOME/data/$DATA_PATH_SUFF/train.parquet \
-    data.val_files=$HOME/data/$DATA_PATH_SUFF/test.parquet \
+    data.train_files=./data/combined/train.parquet \
+    data.val_files=./data/combined/test.parquet \
     data.train_batch_size=1024 \
     data.val_batch_size=1024 \
     data.max_prompt_length=1024 \
