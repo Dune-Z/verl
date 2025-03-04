@@ -41,7 +41,7 @@ python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.model.path=${MODEL_NAME} \
     actor_rollout_ref.actor.optim.lr=5e-7 \
     actor_rollout_ref.model.use_remove_padding=True \
-    actor_rollout_ref.actor.ppo_mini_batch_size=256 \
+    actor_rollout_ref.actor.ppo_mini_batch_size=32 \
     actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=2 \
     actor_rollout_ref.actor.use_kl_loss=True \
     actor_rollout_ref.actor.kl_loss_coef=0.001 \
@@ -53,7 +53,7 @@ python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.rollout.name=vllm \
     actor_rollout_ref.rollout.gpu_memory_utilization=0.6 \
     actor_rollout_ref.rollout.n=1 \
-    actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=32 \
+    actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=4 \
     actor_rollout_ref.actor.ppo_max_token_len_per_gpu=4800 \
     actor_rollout_ref.ref.fsdp_config.param_offload=True \
     actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=4 \

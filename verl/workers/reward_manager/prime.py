@@ -15,14 +15,16 @@
 import asyncio
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
 from functools import partial
+from traceback import print_exc
 
 import torch
 
 from verl import DataProto
 from verl.utils.reward_score import _default_compute_score
+from multiprocessing import cpu_count
 
 
-async def single_compute_score(evaluation_func, completion, reference, task, timeout=300.):
+async def _single_compute_score(evaluation_func, completion, reference, task, timeout=300.):
     loop = asyncio.get_running_loop()
     
     with ThreadPoolExecutor(max_workers=1) as thread_executor:
@@ -41,7 +43,27 @@ async def single_compute_score(evaluation_func, completion, reference, task, tim
             return None
 
 
-async def parallel_compute_score_async(evaluation_func, completions, references, tasks, num_processes=32):
+async def single_compute_score(evaluation_func, completion, reference, task, extra_info, executor, timeout=300):
+    loop = asyncio.get_running_loop()
+    try:
+        # Ensure process_completion is called properly
+        tasks = [
+            asyncio.wait_for(
+                loop.run_in_executor(
+                    executor,
+                    partial(evaluation_func, task, completion, reference, extra_info)  # Ensure synchronous
+                ),
+                timeout=timeout)
+        ]
+        return await asyncio.gather(*tasks)
+    except asyncio.TimeoutError:
+        print(f"Timeout occurred for completion: {completion[:64]}...")
+        return None  # Default value for timed-out rows
+    except Exception:
+        print_exc()
+        return None  # Default value for failed rows
+
+async def _parallel_compute_score_async(evaluation_func, completions, references, tasks, num_processes=32):
     scores = []
     
     with ProcessPoolExecutor(max_workers=num_processes) as executor:
@@ -125,6 +147,37 @@ async def parallel_compute_score_async(evaluation_func, completions, references,
 #         else:
 #             scores.append(float(result[0][0]))
 #     return scores
+async def parallel_compute_score_async(evaluation_func,
+                                       completions,
+                                       references,
+                                       tasks,
+                                       extra_infos=None,
+                                       num_processes=64):
+    scores = []
+    with ThreadPoolExecutor(max_workers=num_processes) as executor:
+        # Create tasks for all rows
+        tasks_async = [
+            single_compute_score(evaluation_func,
+                                 completion,
+                                 reference,
+                                 task,
+                                 extra_info=extra_info,
+                                 executor=executor,
+                                 timeout=600)
+            for completion, reference, task, extra_info in zip(completions, references, tasks, extra_infos)
+        ]
+        # to prevent very occasional starvation caused by some anomalous programs ( like infinite loop ), the exceptions in async programs will instantly halt the evaluation, and all summoned processes will be killed.
+        results = await asyncio.gather(*tasks_async, return_exceptions=False)
+
+    for result, completion, reference, task in zip(results, completions, references, tasks):
+        if isinstance(result, Exception) or result is None:
+            # Handle failed or timed-out tasks
+            scores.append(0.0)
+        elif isinstance(result[0], (int, float, bool)):
+            scores.append(float(result[0]))
+        else:
+            scores.append(float(result[0][0]))
+    return scores
 
 
 class PrimeRewardManager:
@@ -158,7 +211,7 @@ class PrimeRewardManager:
         sequences_str = self.tokenizer.batch_decode(response_ids, skip_special_tokens=True)
         ground_truth = [data_item.non_tensor_batch['reward_model']['ground_truth'] for data_item in data]
         data_sources = data.non_tensor_batch['data_source']
-
+        num_processes = max(cpu_count(), 1)
         assert len(sequences_str) == len(ground_truth) == len(data_sources)
         try:
             scores = asyncio.run(
@@ -166,7 +219,7 @@ class PrimeRewardManager:
                                              sequences_str,
                                              ground_truth,
                                              data_sources,
-                                             num_processes=32))
+                                             num_processes=num_processes))
         except asyncio.TimeoutError as e:
             print('Global timeout in reward computing! Setting all as 0.')
             scores = [0. for _ in range(len(sequences_str))]
