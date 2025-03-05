@@ -27,7 +27,7 @@ def extract_solution(solution_str):
 
 def make_format(example):
     return {
-        "data_source": "math-500",
+        "data_source": example['data_source'],
         "prompt": [
             { "content": example['prompt'][1]['content'] + "Let's think step by step and output the final answer within \\boxed{}.", "role": "user" }
         ],
