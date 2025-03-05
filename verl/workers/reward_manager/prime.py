@@ -12,171 +12,43 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import asyncio
-from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
-from functools import partial
-from traceback import print_exc
-
+from concurrent.futures import ProcessPoolExecutor, as_completed
 import torch
-
 from verl import DataProto
 from verl.utils.reward_score import _default_compute_score
 from multiprocessing import cpu_count
 
 
-async def _single_compute_score(evaluation_func, completion, reference, task, timeout=300.):
-    loop = asyncio.get_running_loop()
-    
-    with ThreadPoolExecutor(max_workers=1) as thread_executor:
-        try:
-            return await asyncio.wait_for(
-                loop.run_in_executor(
-                    thread_executor, partial(evaluation_func, task, completion, reference)
-                ),
-                timeout=timeout
-            )
-        except asyncio.TimeoutError:
-            print(f"Timeout occurred for completion: {completion[:10]}")
-            return None
-        except Exception as e:
-            print(f"Error processing completion: {completion[:10]}, Error: {e}")
-            return None
-
-
-async def single_compute_score(evaluation_func, completion, reference, task, extra_info, executor, timeout=300):
-    loop = asyncio.get_running_loop()
+def single_compute_score(evaluation_func, completion, reference, task, extra_info, executor):
     try:
-        # Ensure process_completion is called properly
-        tasks = [
-            asyncio.wait_for(
-                loop.run_in_executor(
-                    executor,
-                    partial(evaluation_func, task, completion, reference, extra_info)  # Ensure synchronous
-                ),
-                timeout=timeout)
-        ]
-        return await asyncio.gather(*tasks)
-    except asyncio.TimeoutError:
-        print(f"Timeout occurred for completion: {completion[:64]}...")
-        return None  # Default value for timed-out rows
-    except Exception:
-        print_exc()
-        return None  # Default value for failed rows
+        return evaluation_func(task, completion, reference, extra_info)
+    except Exception as e:
+        print(f"Error processing completion: {completion[:10]}, Error: {e}")
+        return 0.0
 
-async def parallel_compute_score_async(evaluation_func, completions, references, tasks, num_processes=32):
+
+def parallel_compute_score(evaluation_func, completions, references, tasks, num_processes=32):
     scores = []
-    
     with ProcessPoolExecutor(max_workers=num_processes) as executor:
         futures = {
             executor.submit(evaluation_func, task, completion, reference): (completion, reference, task)
             for completion, reference, task in zip(completions, references, tasks)
         }
-        
-        try:
-            for future in as_completed(futures, timeout=300):  # Enforce global timeout
-                completion, reference, task = futures[future]
-                try:
-                    result = future.result(timeout=300)  # Per-task timeout
-                    if isinstance(result, (int, float, bool)):
-                        scores.append(float(result))
-                    elif isinstance(result, (list, tuple)) and isinstance(result[0], (int, float, bool)):
-                        scores.append(float(result[0]))
-                    else:
-                        scores.append(0.0)
-                except asyncio.TimeoutError:
-                    print(f"Timeout occurred for completion: {completion[:10]}")
+
+        for future in as_completed(futures):
+            completion, reference, task = futures[future]
+            try:
+                result = future.result()
+                if isinstance(result, (int, float, bool)):
+                    scores.append(float(result))
+                elif isinstance(result, (list, tuple)) and isinstance(result[0], (int, float, bool)):
+                    scores.append(float(result[0]))
+                else:
                     scores.append(0.0)
-                except Exception as e:
-                    print(f"Error processing completion: {completion[:10]}, Error: {e}")
-                    scores.append(0.0)
-        except Exception as global_error:
-            print(f"Global error encountered: {global_error}. Terminating all processes.")
-            executor.shutdown(wait=False, cancel_futures=True)
-            scores = [0.0] * len(completions)
-
-    return scores
-
-
-# async def single_compute_score(evaluation_func, completion, reference, task, executor, timeout=300.):
-#     loop = asyncio.get_running_loop()
-#     try:
-#         # Ensure process_completion is called properly
-#         tasks = [
-#             asyncio.wait_for(
-#                 loop.run_in_executor(
-#                     executor,
-#                     partial(evaluation_func, task, completion, reference)  # Ensure synchronous
-#                 ),
-#                 timeout=timeout)
-#         ]
-#         return await asyncio.gather(*tasks)
-#     except asyncio.TimeoutError:
-#         print(f"Timeout occurred for completion: {completion}")
-#         return None  # Default value for timed-out rows
-#     except Exception as e:
-#         print(f"Error processing completion: {completion[:10]}, Error: {e}")
-#         return None  # Default value for failed rows
-
-
-# async def parallel_compute_score_async(evaluation_func, completions, references, tasks, num_processes=64):
-#     scores = []
-#     with ProcessPoolExecutor(max_workers=num_processes) as executor:
-#         # Create tasks for all rows
-#         tasks_async = [
-#             single_compute_score(evaluation_func, completion, reference, task, executor, timeout=300.)
-#             for completion, reference, task in zip(completions, references, tasks)
-#         ]
-#         # to prevent very occasional starvation caused by some anomalous programs ( like infinite loop ), the exceptions in async programs will instantly halt the evaluation, and all summoned processes will be killed.
-#         try:
-#             results = await asyncio.gather(*tasks_async, return_exceptions=False)
-#         except:
-#             for pid, proc in executor._processes.items():
-#                 try:
-#                     proc.kill()
-#                 except Exception as kill_err:
-#                     print('shut down failed: ' + str(kill_err))
-#             raise
-
-#     # Process results
-#     for result, completion, reference, task in zip(results, completions, references, tasks):
-#         if isinstance(result, Exception) or result is None:
-#             # Handle failed or timed-out tasks
-#             scores.append(0.0)
-#         elif isinstance(result[0], (int, float, bool)):
-#             scores.append(float(result[0]))
-#         else:
-#             scores.append(float(result[0][0]))
-#     return scores
-async def _parallel_compute_score_async(evaluation_func,
-                                       completions,
-                                       references,
-                                       tasks,
-                                       extra_infos=None,
-                                       num_processes=64):
-    scores = []
-    with ThreadPoolExecutor(max_workers=num_processes) as executor:
-        # Create tasks for all rows
-        tasks_async = [
-            single_compute_score(evaluation_func,
-                                 completion,
-                                 reference,
-                                 task,
-                                 extra_info=extra_info,
-                                 executor=executor,
-                                 timeout=600)
-            for completion, reference, task, extra_info in zip(completions, references, tasks, extra_infos)
-        ]
-        # to prevent very occasional starvation caused by some anomalous programs ( like infinite loop ), the exceptions in async programs will instantly halt the evaluation, and all summoned processes will be killed.
-        results = await asyncio.gather(*tasks_async, return_exceptions=False)
-
-    for result, completion, reference, task in zip(results, completions, references, tasks):
-        if isinstance(result, Exception) or result is None:
-            # Handle failed or timed-out tasks
-            scores.append(0.0)
-        elif isinstance(result[0], (int, float, bool)):
-            scores.append(float(result[0]))
-        else:
-            scores.append(float(result[0][0]))
+            except Exception as e:
+                print(f"Error processing completion: {completion[:10]}, Error: {e}")
+                scores.append(0.0)
+    
     return scores
 
 
@@ -191,6 +63,7 @@ class PrimeRewardManager:
         self.compute_score = compute_score or _default_compute_score
         self.scale = scale
         self.offset = offset
+
     def __call__(self, data: DataProto):
         """We will expand this function gradually based on the available datasets"""
 
@@ -213,19 +86,8 @@ class PrimeRewardManager:
         data_sources = data.non_tensor_batch['data_source']
         num_processes = max(cpu_count(), 1)
         assert len(sequences_str) == len(ground_truth) == len(data_sources)
-        try:
-            scores = asyncio.run(
-                parallel_compute_score_async(self.compute_score,
-                                             sequences_str,
-                                             ground_truth,
-                                             data_sources,
-                                             num_processes=num_processes))
-        except asyncio.TimeoutError as e:
-            print('Global timeout in reward computing! Setting all as 0.')
-            scores = [0. for _ in range(len(sequences_str))]
-        except Exception as e:
-            print(f"Unexpected error in batched reward computing. Setting all as 0.: {e}")
-            scores = [0. for _ in range(len(sequences_str))]
+
+        scores = parallel_compute_score(self.compute_score, sequences_str, ground_truth, data_sources, num_processes=num_processes)
 
         for i in range(len(data)):
             data_source = data_sources[i]

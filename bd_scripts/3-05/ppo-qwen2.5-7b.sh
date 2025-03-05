@@ -1,3 +1,9 @@
+wget -qO- https://astral.sh/uv/install.sh | sh
+uv venv briter --python 3.11 && source briter/bin/activate && uv pip install --upgrade pip --link-mode=copy
+uv pip install -r requirements.txt --link-mode=copy
+uv pip install flash_attn --no-build-isolation --link-mode=copy
+uv uninstall wandb
+uv pip install wandb --no-cache-dir --link-mode=copy
 export WANDB_API_KEY=d61cd005c38e0e1e27d921c951303410316ac718
 wandb login --relogin $WANDB_API_KEY
 
@@ -6,8 +12,8 @@ TASK_NAMES=("prime" "math500")
 sft_loss_coef=0
 REMOTE_DATA_PATH=PRIME-RL/Eurus-2-RL-Data
 SAVE_LOCAL_DIR_PREFIX='checkpoints/'
-PROJECT_NAME=Qwen2.5-Math-1.5B
-MODEL_NAME=Qwen/Qwen2.5-Math-1.5B
+PROJECT_NAME=Qwen2.5-7B
+MODEL_NAME=Qwen/Qwen2.5-7B
 EXPERIMENT_NAME=ppo
 SAVE_LOCAL_DIR=${SAVE_LOCAL_DIR_PREFIX}${PROJECT_NAME}/${EXPERIMENT_NAME}
 
@@ -29,40 +35,48 @@ echo "Combined tasks: ${TASK_NAMES[@]}"
 python3 data_preprocess/combine_parquet.py --data_dirs ${DATA_PATHS[@]} --output_dir ./data/combined
 python3 data_preprocess/combine_parquet.py --data_dirs ./data/prime --output_dir ./data/combined --split train
 
+
 export HYDRA_FULL_ERROR=1
 export VLLM_ATTENTION_BACKEND=XFORMERS
-# yifei's key
-export WANDB_API_KEY=d61cd005c38e0e1e27d921c951303410316ac718
 python3 -m verl.trainer.main_ppo \
+    actor_rollout_ref.actor.sft_loss_coef=${sft_loss_coef} \
     algorithm.reward_scale=1. \
-    algorithm.reward_offset=0. \
-    algorithm.adv_estimator=grpo \
+    algorithm.reward_offset=0 \
+    algorithm.adv_estimator=gae \
+    algorithm.kl_ctrl.kl_coef=0.001 \
     reward_model.reward_manager=prime \
     data.custom_temp_dir=$HOME/tmp/ray/  \
     data.train_files=./data/combined/train.parquet \
     data.val_files=./data/combined/test.parquet \
-    data.train_batch_size=128 \
-    data.val_batch_size=128 \
+    data.train_batch_size=1024 \
+    data.val_batch_size=512 \
     data.max_prompt_length=1024 \
-    data.max_response_length=1024 \
+    data.max_response_length=7168 \
     actor_rollout_ref.model.path=${MODEL_NAME} \
-    actor_rollout_ref.actor.optim.lr=5e-7 \
     actor_rollout_ref.model.use_remove_padding=True \
+    actor_rollout_ref.model.enable_gradient_checkpointing=True \
+    actor_rollout_ref.actor.optim.lr=1e-6 \
     actor_rollout_ref.actor.ppo_mini_batch_size=256 \
+    actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=8 \
     actor_rollout_ref.actor.use_kl_loss=True \
     actor_rollout_ref.actor.kl_loss_coef=0.001 \
     actor_rollout_ref.actor.kl_loss_type=low_var_kl \
-    actor_rollout_ref.model.enable_gradient_checkpointing=True \
     actor_rollout_ref.actor.fsdp_config.param_offload=False \
     actor_rollout_ref.actor.fsdp_config.optimizer_offload=False \
-    actor_rollout_ref.rollout.tensor_model_parallel_size=1 \
+    actor_rollout_ref.rollout.tensor_model_parallel_size=2 \
     actor_rollout_ref.rollout.name=vllm \
     actor_rollout_ref.rollout.gpu_memory_utilization=0.6 \
     actor_rollout_ref.rollout.n=1 \
-    actor_rollout_ref.actor.use_dynamic_bsz=True \
-    actor_rollout_ref.actor.ppo_max_token_len_per_gpu=4800 \
+    actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=32 \
+    actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=32 \
     actor_rollout_ref.ref.fsdp_config.param_offload=True \
-    algorithm.kl_ctrl.kl_coef=0.001 \
+    critic.optim.lr=1e-5 \
+    critic.model.use_remove_padding=True \
+    critic.model.path=${MODEL_NAME} \
+    critic.model.enable_gradient_checkpointing=True \
+    critic.ppo_micro_batch_size_per_gpu=16 \
+    critic.model.fsdp_config.param_offload=False \
+    critic.model.fsdp_config.optimizer_offload=False \
     trainer.critic_warmup=0 \
     trainer.logger=['console','wandb'] \
     trainer.project_name=${PROJECT_NAME} \
