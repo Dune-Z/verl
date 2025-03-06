@@ -8,7 +8,7 @@ REMOTE_DATA_PATH=PRIME-RL/Eurus-2-RL-Data
 SAVE_LOCAL_DIR_PREFIX='checkpoints/'
 PROJECT_NAME=Qwen2.5-Math-7B
 MODEL_NAME=Qwen/Qwen2.5-Math-7B
-EXPERIMENT_NAME=ppo
+EXPERIMENT_NAME=ppo-4k
 SAVE_LOCAL_DIR=/checkpoints/hongpaul-sandbox/r1/${PROJECT_NAME}/${EXPERIMENT_NAME}
 
 ### preprocess the dataset
