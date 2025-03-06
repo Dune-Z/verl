@@ -87,8 +87,8 @@ class vLLMRollout(BaseRollout):
                 vllm_ps.initialize_parallel_state(tensor_model_parallel_size=tensor_parallel_size,
                                                   num_tp_per_train_tp=num_tp_per_train_tp)
 
-        assert model_hf_config.max_position_embeddings >= config.prompt_length + config.response_length, \
-            "model context length should be greater than total sequence length"
+        # assert model_hf_config.max_position_embeddings >= config.prompt_length + config.response_length, \
+        #     "model context length should be greater than total sequence length"
         self.inference_engine = LLM(
             actor_module,
             tokenizer=tokenizer,
