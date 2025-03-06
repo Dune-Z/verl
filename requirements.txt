@@ -18,3 +18,4 @@ transformers
 vllm==0.6.3
 wandb
 yapf
+sympy==1.12
