@@ -17,11 +17,8 @@ Preprocess the GSM8k dataset to parquet format
 
 import os
 import datasets
-
-from verl.utils.hdfs_io import copy, makedirs
 import argparse
-
-from verl.utils.reward_score.math import remove_boxed, last_boxed_only_string
+from utils import remove_boxed, last_boxed_only_string, copy, makedirs
 
 
 def extract_solution(solution_str):
@@ -32,6 +29,9 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--local_dir', default='~/data/math')
     parser.add_argument('--hdfs_dir', default=None)
+    parser.add_argument("--sample_start_idx", default=0, type=int)
+    parser.add_argument("--sample_end_idx", default=999999999, type=int)
+    parser.add_argument("--data_remote_dir",default='HuggingFaceH4/MATH-500', type=str)
 
     args = parser.parse_args()
 
@@ -89,3 +89,4 @@ if __name__ == '__main__':
         makedirs(hdfs_dir)
 
         copy(src=local_dir, dst=hdfs_dir)
+
