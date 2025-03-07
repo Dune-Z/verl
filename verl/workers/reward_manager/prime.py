@@ -28,27 +28,26 @@ def single_compute_score(evaluation_func, completion, reference, task, extra_inf
 
 
 def parallel_compute_score(evaluation_func, completions, references, tasks, num_processes=32):
-    scores = []
+    scores = [0.0] * len(completions)
     with ProcessPoolExecutor(max_workers=num_processes) as executor:
         futures = {
-            executor.submit(evaluation_func, task, completion, reference): (completion, reference, task)
-            for completion, reference, task in zip(completions, references, tasks)
+            executor.submit(evaluation_func, task, completion, reference): idx
+            for idx, (completion, reference, task) in enumerate(zip(completions, references, tasks))
         }
 
         for future in as_completed(futures):
-            completion, reference, task = futures[future]
+            idx = futures[future]
             try:
                 result = future.result()
                 if isinstance(result, (int, float, bool)):
-                    scores.append(float(result))
+                    scores[idx] = float(result)
                 elif isinstance(result, (list, tuple)) and isinstance(result[0], (int, float, bool)):
-                    scores.append(float(result[0]))
+                    scores[idx] = float(result[0])
                 else:
-                    scores.append(0.0)
+                    scores[idx] = 0.0
             except Exception as e:
-                print(f"Error processing completion: {completion[:10]}, Error: {e}")
-                scores.append(0.0)
-    
+                print(f"Error processing completion at index {idx}: {e}")
+                scores[idx] = 0.0
     return scores
 
 
