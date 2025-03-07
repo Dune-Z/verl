@@ -1,125 +1,0 @@
-wandb: Appending key for api.wandb.ai to your netrc file: /home/yifeizuo/.netrc
-wandb: W&B API key is configured. Use `wandb login --relogin` to force relogin
-Creating parquet from Arrow format:   0%|          | 0/456 [00:00<?, ?ba/s]Creating parquet from Arrow format:  10%|█         | 46/456 [00:00<00:00, 458.00ba/s]Creating parquet from Arrow format:  21%|██▏       | 97/456 [00:00<00:00, 487.67ba/s]Creating parquet from Arrow format:  32%|███▏      | 146/456 [00:00<00:00, 473.68ba/s]Creating parquet from Arrow format:  43%|████▎     | 194/456 [00:00<00:00, 464.85ba/s]Creating parquet from Arrow format:  53%|█████▎    | 241/456 [00:00<00:00, 458.50ba/s]Creating parquet from Arrow format:  64%|██████▍   | 291/456 [00:00<00:00, 470.08ba/s]Creating parquet from Arrow format:  75%|███████▌  | 344/456 [00:00<00:00, 488.62ba/s]Creating parquet from Arrow format:  88%|████████▊ | 399/456 [00:00<00:00, 507.12ba/s]Creating parquet from Arrow format: 100%|█████████▉| 455/456 [00:00<00:00, 520.54ba/s]Creating parquet from Arrow format: 100%|██████████| 456/456 [00:00<00:00, 493.44ba/s]
-Creating parquet from Arrow format:   0%|          | 0/2 [00:00<?, ?ba/s]Creating parquet from Arrow format: 100%|██████████| 2/2 [00:00<00:00, 358.12ba/s]
-Creating parquet from Arrow format:   0%|          | 0/1 [00:00<?, ?ba/s]Creating parquet from Arrow format: 100%|██████████| 1/1 [00:00<00:00, 593.17ba/s]
-Generating train split:   0%|          | 0/7500 [00:00<?, ? examples/s]Generating train split: 100%|██████████| 7500/7500 [00:00<00:00, 208857.49 examples/s]
-Generating test split:   0%|          | 0/5000 [00:00<?, ? examples/s]Generating test split: 100%|██████████| 5000/5000 [00:00<00:00, 300895.59 examples/s]
-Map:   0%|          | 0/7500 [00:00<?, ? examples/s]Map:  15%|█▍        | 1111/7500 [00:00<00:00, 11025.39 examples/s]Map:  34%|███▍      | 2557/7500 [00:00<00:00, 10053.94 examples/s]Map:  53%|█████▎    | 4000/7500 [00:00<00:00, 9497.17 examples/s] Map:  80%|████████  | 6000/7500 [00:00<00:00, 12126.67 examples/s]Map: 100%|██████████| 7500/7500 [00:00<00:00, 12010.76 examples/s]
-Map:   0%|          | 0/5000 [00:00<?, ? examples/s]Map:  30%|██▉       | 1477/5000 [00:00<00:00, 14692.28 examples/s]Map:  60%|██████    | 3000/5000 [00:00<00:00, 11054.77 examples/s]Map:  92%|█████████▏| 4579/5000 [00:00<00:00, 12858.59 examples/s]Map: 100%|██████████| 5000/5000 [00:00<00:00, 12608.36 examples/s]
-Creating parquet from Arrow format:   0%|          | 0/8 [00:00<?, ?ba/s]Creating parquet from Arrow format: 100%|██████████| 8/8 [00:00<00:00, 560.54ba/s]
-Creating parquet from Arrow format:   0%|          | 0/5 [00:00<?, ?ba/s]Creating parquet from Arrow format: 100%|██████████| 5/5 [00:00<00:00, 621.32ba/s]
-Generating test split: 0 examples [00:00, ? examples/s]Generating test split: 1024 examples [00:00, 144533.83 examples/s]
-Generating test split: 0 examples [00:00, ? examples/s]Generating test split: 500 examples [00:00, 105051.95 examples/s]
-Generating test split: 0 examples [00:00, ? examples/s]Generating test split: 5000 examples [00:00, 414596.21 examples/s]
-Creating parquet from Arrow format:   0%|          | 0/7 [00:00<?, ?ba/s]Creating parquet from Arrow format: 100%|██████████| 7/7 [00:00<00:00, 575.23ba/s]
-Generating train split: 0 examples [00:00, ? examples/s]Generating train split: 46000 examples [00:00, 443927.48 examples/s]Generating train split: 111000 examples [00:00, 561225.84 examples/s]Generating train split: 177000 examples [00:00, 598613.47 examples/s]Generating train split: 241000 examples [00:00, 608824.86 examples/s]Generating train split: 322000 examples [00:00, 575601.24 examples/s]Generating train split: 416000 examples [00:00, 584520.11 examples/s]Generating train split: 455261 examples [00:00, 591508.87 examples/s]
-Creating parquet from Arrow format:   0%|          | 0/456 [00:00<?, ?ba/s]Creating parquet from Arrow format:  12%|█▎        | 57/456 [00:00<00:00, 561.13ba/s]Creating parquet from Arrow format:  25%|██▌       | 114/456 [00:00<00:00, 559.70ba/s]Creating parquet from Arrow format:  37%|███▋      | 170/456 [00:00<00:00, 545.38ba/s]Creating parquet from Arrow format:  50%|████▉     | 226/456 [00:00<00:00, 547.99ba/s]Creating parquet from Arrow format:  62%|██████▏   | 281/456 [00:00<00:00, 546.72ba/s]Creating parquet from Arrow format:  74%|███████▎  | 336/456 [00:00<00:00, 505.79ba/s]Creating parquet from Arrow format:  85%|████████▌ | 388/456 [00:00<00:00, 483.64ba/s]Creating parquet from Arrow format:  96%|█████████▌| 437/456 [00:00<00:00, 473.03ba/s]Creating parquet from Arrow format: 100%|██████████| 456/456 [00:00<00:00, 503.48ba/s]
-2025-03-07 10:42:18,740	INFO worker.py:1832 -- Started a local Ray instance. View the dashboard at [1m[32mhttp://127.0.0.1:8265 [39m[22m
-[36m(WorkerDict pid=1073766)[0m You are attempting to use Flash Attention 2.0 with a model not initialized on GPU. Make sure to move the model to GPU after initializing it on CPU with `model.to('cuda')`.
-[36m(WorkerDict pid=1073766)[0m Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]
-[36m(WorkerDict pid=1073766)[0m Loading checkpoint shards:  25%|██▌       | 1/4 [00:00<00:02,  1.23it/s]
-[36m(WorkerDict pid=1073594)[0m Loading checkpoint shards: 100%|██████████| 4/4 [00:01<00:00,  2.22it/s]Loading checkpoint shards: 100%|██████████| 4/4 [00:01<00:00,  2.27it/s]
-[36m(WorkerDict pid=1073771)[0m Flash Attention 2.0 only supports torch.float16 and torch.bfloat16 dtypes, but the current dype in Qwen2ForCausalLM is torch.float32. You should run training or inference using Automatic Mixed-Precision via the `with torch.autocast(device_type='torch_device'):` decorator, or load the model with the `torch_dtype` argument. Example: `model = AutoModel.from_pretrained("openai/whisper-tiny", attn_implementation="flash_attention_2", torch_dtype=torch.float16)`
-[36m(WorkerDict pid=1073770)[0m You are attempting to use Flash Attention 2.0 with a model not initialized on GPU. Make sure to move the model to GPU after initializing it on CPU with `model.to('cuda')`.[32m [repeated 7x across cluster][0m
-[36m(WorkerDict pid=1073771)[0m Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s][32m [repeated 8x across cluster][0m
-[36m(WorkerDict pid=1073771)[0m Loading checkpoint shards:  75%|███████▌  | 3/4 [00:01<00:00,  1.52it/s][32m [repeated 23x across cluster][0m
-[36m(WorkerDict pid=1073768)[0m Loading checkpoint shards: 100%|██████████| 4/4 [00:01<00:00,  2.06it/s]Loading checkpoint shards: 100%|██████████| 4/4 [00:01<00:00,  2.12it/s][32m [repeated 7x across cluster][0m
-[36m(WorkerDict pid=1073770)[0m Flash Attention 2.0 only supports torch.float16 and torch.bfloat16 dtypes, but the current dype in Qwen2ForCausalLM is torch.float32. You should run training or inference using Automatic Mixed-Precision via the `with torch.autocast(device_type='torch_device'):` decorator, or load the model with the `torch_dtype` argument. Example: `model = AutoModel.from_pretrained("openai/whisper-tiny", attn_implementation="flash_attention_2", torch_dtype=torch.float16)`[32m [repeated 7x across cluster][0m
-[36m(WorkerDict pid=1073770)[0m Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s][32m [repeated 7x across cluster][0m
-[36m(WorkerDict pid=1073594)[0m Loading checkpoint shards:  25%|██▌       | 1/4 [00:06<00:20,  6.85s/it][32m [repeated 22x across cluster][0m
-[36m(WorkerDict pid=1073767)[0m Loading checkpoint shards: 100%|██████████| 4/4 [00:01<00:00,  2.85it/s]Loading checkpoint shards: 100%|██████████| 4/4 [00:01<00:00,  2.75it/s][32m [repeated 7x across cluster][0m
-[36m(WorkerDict pid=1073594)[0m Loading checkpoint shards:  50%|█████     | 2/4 [00:12<00:11,  5.99s/it]
-[36m(WorkerDict pid=1073594)[0m Loading checkpoint shards:  75%|███████▌  | 3/4 [00:18<00:06,  6.30s/it]
-[36m(WorkerDict pid=1073594)[0m Loading checkpoint shards: 100%|██████████| 4/4 [00:27<00:00,  7.27s/it]Loading checkpoint shards: 100%|██████████| 4/4 [00:27<00:00,  6.91s/it]
-[36m(WorkerDict pid=1073766)[0m /home/yifeizuo/yifeizuo/verl/briter/lib/python3.11/site-packages/xformers/ops/fmha/flash.py:211: FutureWarning: `torch.library.impl_abstract` was renamed to `torch.library.register_fake`. Please use that instead; we will remove `torch.library.impl_abstract` in a future version of PyTorch.
-[36m(WorkerDict pid=1073766)[0m   @torch.library.impl_abstract("xformers_flash::flash_fwd")
-[36m(WorkerDict pid=1073771)[0m   @torch.library.impl_abstract("xformers_flash::flash_bwd")
-[36m(WorkerDict pid=1073768)[0m /home/yifeizuo/yifeizuo/verl/briter/lib/python3.11/site-packages/torch/distributed/fsdp/fully_sharded_data_parallel.py:689: FutureWarning: FSDP.state_dict_type() and FSDP.set_state_dict_type() are being deprecated. Please use APIs, get_state_dict() and set_state_dict(), which can support different parallelisms, FSDP1, FSDP2, DDP. API doc: https://pytorch.org/docs/stable/distributed.checkpoint.html#torch.distributed.checkpoint.state_dict.get_state_dict .Tutorial: https://pytorch.org/tutorials/recipes/distributed_checkpoint_recipe.html .
-[36m(WorkerDict pid=1073768)[0m   warnings.warn(
-[36m(WorkerDict pid=1073594)[0m /home/yifeizuo/yifeizuo/verl/briter/lib/python3.11/site-packages/xformers/ops/fmha/flash.py:344: FutureWarning: `torch.library.impl_abstract` was renamed to `torch.library.register_fake`. Please use that instead; we will remove `torch.library.impl_abstract` in a future version of PyTorch.[32m [repeated 15x across cluster][0m
-[36m(WorkerDict pid=1073594)[0m   @torch.library.impl_abstract("xformers_flash::flash_fwd")[32m [repeated 7x across cluster][0m
-[36m(WorkerDict pid=1073594)[0m   @torch.library.impl_abstract("xformers_flash::flash_bwd")[32m [repeated 7x across cluster][0m
-[36m(main_task pid=1071449)[0m wandb: Using wandb-core as the SDK backend.  Please refer to https://wandb.me/wandb-core for more information.
-[36m(WorkerDict pid=1073769)[0m /home/yifeizuo/yifeizuo/verl/briter/lib/python3.11/site-packages/torch/distributed/fsdp/fully_sharded_data_parallel.py:689: FutureWarning: FSDP.state_dict_type() and FSDP.set_state_dict_type() are being deprecated. Please use APIs, get_state_dict() and set_state_dict(), which can support different parallelisms, FSDP1, FSDP2, DDP. API doc: https://pytorch.org/docs/stable/distributed.checkpoint.html#torch.distributed.checkpoint.state_dict.get_state_dict .Tutorial: https://pytorch.org/tutorials/recipes/distributed_checkpoint_recipe.html .[32m [repeated 7x across cluster][0m
-[36m(WorkerDict pid=1073769)[0m   warnings.warn([32m [repeated 7x across cluster][0m
-[36m(main_task pid=1071449)[0m wandb: Currently logged in as: yifeizuo2029 (yifeizuo2029-northwestern-university) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
-[36m(main_task pid=1071449)[0m wandb: Tracking run with wandb version 0.19.7
-[36m(main_task pid=1071449)[0m wandb: Run data is saved locally in /home/yifeizuo/yifeizuo/verl/wandb/run-20250307_104805-iuuchkp0
-[36m(main_task pid=1071449)[0m wandb: Run `wandb offline` to turn off syncing.
-[36m(main_task pid=1071449)[0m wandb: Syncing run debug
-[36m(main_task pid=1071449)[0m wandb: ⭐️ View project at https://wandb.ai/yifeizuo2029-northwestern-university/Qwen2.5-Math-7B
-[36m(main_task pid=1071449)[0m wandb: 🚀 View run at https://wandb.ai/yifeizuo2029-northwestern-university/Qwen2.5-Math-7B/runs/iuuchkp0
-[36m(main_task pid=1071449)[0m WARNING:2025-03-07 11:28:52,941:WARNING: Error in configuration: macro '\frac' failed its substitution!
-[36m(WorkerDict pid=1073594)[0m /home/yifeizuo/yifeizuo/verl/briter/lib/python3.11/site-packages/torch/utils/checkpoint.py:1399: FutureWarning: `torch.cpu.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cpu', args...)` instead.
-[36m(WorkerDict pid=1073594)[0m   with device_autocast_ctx, torch.cpu.amp.autocast(**cpu_autocast_kwargs), recompute_context:  # type: ignore[attr-defined]
-Traceback (most recent call last):
-  File "<frozen runpy>", line 198, in _run_module_as_main
-  File "<frozen runpy>", line 88, in _run_code
-  File "/home/yifeizuo/yifeizuo/verl/verl/trainer/main_ppo.py", line 134, in <module>
-    main()
-  File "/home/yifeizuo/yifeizuo/verl/briter/lib/python3.11/site-packages/hydra/main.py", line 94, in decorated_main
-    _run_hydra(
-  File "/home/yifeizuo/yifeizuo/verl/briter/lib/python3.11/site-packages/hydra/_internal/utils.py", line 394, in _run_hydra
-    _run_app(
-  File "/home/yifeizuo/yifeizuo/verl/briter/lib/python3.11/site-packages/hydra/_internal/utils.py", line 457, in _run_app
-    run_and_report(
-  File "/home/yifeizuo/yifeizuo/verl/briter/lib/python3.11/site-packages/hydra/_internal/utils.py", line 220, in run_and_report
-    return func()
-           ^^^^^^
-  File "/home/yifeizuo/yifeizuo/verl/briter/lib/python3.11/site-packages/hydra/_internal/utils.py", line 458, in <lambda>
-    lambda: hydra.run(
-            ^^^^^^^^^^
-  File "/home/yifeizuo/yifeizuo/verl/briter/lib/python3.11/site-packages/hydra/_internal/hydra.py", line 119, in run
-    ret = run_job(
-          ^^^^^^^^
-  File "/home/yifeizuo/yifeizuo/verl/briter/lib/python3.11/site-packages/hydra/core/utils.py", line 186, in run_job
-    ret.return_value = task_function(task_cfg)
-                       ^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/yifeizuo/yifeizuo/verl/verl/trainer/main_ppo.py", line 25, in main
-    run_ppo(config)
-  File "/home/yifeizuo/yifeizuo/verl/verl/trainer/main_ppo.py", line 38, in run_ppo
-    ray.get(main_task.remote(config, compute_score))
-  File "/home/yifeizuo/yifeizuo/verl/briter/lib/python3.11/site-packages/ray/_private/auto_init_hook.py", line 21, in auto_init_wrapper
-    return fn(*args, **kwargs)
-           ^^^^^^^^^^^^^^^^^^^
-  File "/home/yifeizuo/yifeizuo/verl/briter/lib/python3.11/site-packages/ray/_private/client_mode_hook.py", line 103, in wrapper
-    return func(*args, **kwargs)
-           ^^^^^^^^^^^^^^^^^^^^^
-  File "/home/yifeizuo/yifeizuo/verl/briter/lib/python3.11/site-packages/ray/_private/worker.py", line 2771, in get
-    values, debugger_breakpoint = worker.get_objects(object_refs, timeout=timeout)
-                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/yifeizuo/yifeizuo/verl/briter/lib/python3.11/site-packages/ray/_private/worker.py", line 893, in get_objects
-    ] = self.core_worker.get_objects(
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "python/ray/_raylet.pyx", line 3189, in ray._raylet.CoreWorker.get_objects
-  File "python/ray/includes/common.pxi", line 83, in ray._raylet.check_status
-KeyboardInterrupt
-Exception ignored in atexit callback: <function shutdown at 0x7f2c6789a5c0>
-Traceback (most recent call last):
-  File "/home/yifeizuo/yifeizuo/verl/briter/lib/python3.11/site-packages/ray/_private/client_mode_hook.py", line 103, in wrapper
-    return func(*args, **kwargs)
-           ^^^^^^^^^^^^^^^^^^^^^
-  File "/home/yifeizuo/yifeizuo/verl/briter/lib/python3.11/site-packages/ray/_private/worker.py", line 1903, in shutdown
-    from ray.dag.compiled_dag_node import _shutdown_all_compiled_dags
-  File "/home/yifeizuo/yifeizuo/verl/briter/lib/python3.11/site-packages/ray/dag/__init__.py", line 1, in <module>
-    from ray.dag.dag_node import DAGNode
-  File "/home/yifeizuo/yifeizuo/verl/briter/lib/python3.11/site-packages/ray/dag/dag_node.py", line 2, in <module>
-    from ray.experimental.channel.auto_transport_type import AutoTransportType
-  File "/home/yifeizuo/yifeizuo/verl/briter/lib/python3.11/site-packages/ray/experimental/channel/__init__.py", line 1, in <module>
-    from ray.experimental.channel.cached_channel import CachedChannel
-  File "/home/yifeizuo/yifeizuo/verl/briter/lib/python3.11/site-packages/ray/experimental/channel/cached_channel.py", line 4, in <module>
-    from ray.experimental.channel.common import ChannelInterface
-  File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
-  File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
-  File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
-  File "<frozen importlib._bootstrap_external>", line 936, in exec_module
-  File "<frozen importlib._bootstrap_external>", line 1032, in get_code
-  File "<frozen importlib._bootstrap_external>", line 1131, in get_data
-KeyboardInterrupt: 
-Exception ignored in atexit callback: <function shutdown at 0x7f2d3ea1c400>
-Traceback (most recent call last):
-  File "/home/yifeizuo/.local/share/uv/python/cpython-3.11.11-linux-x86_64-gnu/lib/python3.11/logging/__init__.py", line 2170, in shutdown
-    def shutdown(handlerList=_handlerList):
-    
-KeyboardInterrupt: 
