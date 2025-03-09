@@ -1,6 +1,7 @@
 source ~/.bashrc
 eval "$(conda shell.bash hook)"
 export HF_HOME="/projects/p32646/hf_cache"
+huggingface-cli login --token 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
 
 export HOME="/projects/p32646"
 
@@ -42,7 +43,7 @@ python3 -m verl.trainer.main_ppo \
     algorithm.reward_offset=0 \
     algorithm.adv_estimator=gae \
     algorithm.kl_ctrl.kl_coef=0.001 \
-    reward_model.reward_manager=naive \
+    reward_model.reward_manager=my_reward \
     data.custom_temp_dir=$HOME/tmp/ray/  \
     data.train_files=./data/combined/train.parquet \
     data.val_files=./data/combined/test.parquet \
