@@ -110,6 +110,9 @@ def main_task(config, compute_score=None):
     elif reward_manager_name == 'prime':
         from verl.workers.reward_manager import PrimeRewardManager
         reward_manager_cls = PrimeRewardManager
+    elif reward_manager_name == 'my_reward':
+        from verl.workers.reward_manager import MyRewardManager
+        reward_manager_cls = MyRewardManager
     else:
         raise NotImplementedError
     reward_fn = reward_manager_cls(tokenizer=tokenizer, num_examine=0, compute_score=compute_score)
