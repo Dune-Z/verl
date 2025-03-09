@@ -1,7 +1,6 @@
 source ~/.bashrc
 eval "$(conda shell.bash hook)"
 export HF_HOME="/projects/p32646/hf_cache"
-# huggingface-cli login --token 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
 
 export HOME="/projects/p32646"
 
