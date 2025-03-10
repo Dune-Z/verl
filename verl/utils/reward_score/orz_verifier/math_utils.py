@@ -178,25 +178,21 @@ def _is_latex_equal(str1, str2):
     return False
 
 
-async def is_latex_equal(str1, str2, executor, math_mode="legacy"):
+def is_latex_equal(str1, str2, math_mode="legacy"):
     if math_mode == "legacy":
         if (len(str1) > 128 and repeatness(str1)) or (len(str2) > 128 and repeatness(str2)):
             return False
 
         try:
-            loop = asyncio.get_event_loop()
-            task = loop.run_in_executor(executor, _is_latex_equal, str1, str2)
-            result = await asyncio.wait_for(task, timeout=1.0)
+            result = _is_latex_equal(str1, str2)
             return result
-        except asyncio.exceptions.TimeoutError:
+        except Exception:
             return False
     elif math_mode == "math_verify":
         try:
-            loop = asyncio.get_event_loop()
-            task = loop.run_in_executor(executor, verify, parse(str1), parse(str2))
-            result = await asyncio.wait_for(task, timeout=1.0)
+            result = verify(parse(str1), parse(str2))
             return result
-        except asyncio.exceptions.TimeoutError:
+        except Exception:
             return False
     else:
         raise NotImplementedError(f"Math mode {math_mode} is not implemented")
@@ -411,11 +407,11 @@ def get_answer_str(s: str) -> str:
     return s
 
 
-async def is_equal(str1, str2, executor, math_mode="legacy"):
+def is_equal(str1, str2, math_mode="legacy"):
     first_equal = is_equiv(str1, str2)
     if first_equal:
         return True
-    return await is_latex_equal(str1, str2, executor, math_mode)
+    return is_latex_equal(str1, str2, math_mode)
 
 
 def solution2answer(solution: str, math_mode="eval_peeking") -> str:

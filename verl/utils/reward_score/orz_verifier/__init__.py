@@ -14,9 +14,15 @@ def compute_score(solution_str, ground_truth, continuous=False):
         float: score between 0 and 1
     """
     try:
-        # Extract final answer using the same pattern as in generate_vllm
+        # First try to find answer within <answer> tags
         pattern = re.compile(r"<answer>.*?(\\boxed{.*}).*?</answer>", re.DOTALL)
         matches = re.findall(pattern, solution_str)
+        
+        # If no matches found, try to find any \boxed{} directly
+        # if not matches:
+        #     pattern = re.compile(r"\\boxed{([^}]*)}")
+        #     matches = re.findall(pattern, solution_str)
+            
         final_answer = matches[-1] if matches else ""
         
         # If no answer found or not properly stopped, return 0
@@ -27,7 +33,7 @@ def compute_score(solution_str, ground_truth, continuous=False):
         label = solution2answer(ground_truth)
         prefix_response = solution2answer(final_answer)
         
-        # Compare using is_equal, same as in generate_vllm
+        # Compare using is_equal
         result = is_equal(label, prefix_response)
         
         # Return 1.0 if correct, 0.0 if wrong

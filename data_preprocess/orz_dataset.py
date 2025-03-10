@@ -18,6 +18,9 @@ import argparse
 from utils import copy, makedirs
 import json
 
+def make_prefix(question):
+    prefix = f"""A conversation between User and Assistant. The user asks a question, and the Assistant solves it. The assistant first thinks about the reasoning process in the mind and then provides the user with the answer. The reasoning process and answer are enclosed within <think> </think> and <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>. User: {question} Assistant: <think>"""
+    return prefix
 
 def make_format(example, idx):
     messages = example['messages']
@@ -25,6 +28,7 @@ def make_format(example, idx):
     assistant_message = messages[1]
     
     question = human_message["value"]
+    question = make_prefix(question)
     answer = assistant_message["ground_truth"]["value"]
         
     data = {
@@ -56,12 +60,6 @@ def main():
 
     print("Loading the local dataset...", flush=True)
     from pathlib import Path
-
-    file_path = Path(os.path.join(args.local_dir, 'train.parquet'))
-
-    if file_path.exists() and file_path.suffix == ".parquet":
-        print("file existed")
-        return
 
     with open('./data_preprocess/orz_math_57k_collected.json', 'r', encoding='utf-8') as f:
         raw_data = json.load(f)

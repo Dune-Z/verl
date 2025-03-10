@@ -45,8 +45,8 @@ python3 -m verl.trainer.main_ppo \
     algorithm.kl_ctrl.kl_coef=0.001 \
     reward_model.reward_manager=prime \
     data.custom_temp_dir=$HOME/tmp/ray/  \
-    data.train_files=./data/orz_dataset/train.parquet \
-    data.val_files=./data/combined/test.parquet \
+    data.train_files=./data/math_dataset/train.parquet \
+    data.val_files=./data/orz_dataset/test.parquet \
     data.train_batch_size=512 \
     data.val_batch_size=512 \
     data.max_prompt_length=1024 \
