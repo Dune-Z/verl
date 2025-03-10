@@ -30,7 +30,7 @@ def make_format(example, idx):
     question = make_prefix(question)
         
     data = {
-        "data_source": "gpqa_diamond",
+        "data_source": "orz_math500",
         "prompt": [{
             "role": "user",
             "content": question,
@@ -59,7 +59,7 @@ def main():
     print("Loading the local dataset...", flush=True)
     from pathlib import Path
 
-    with open('./data_preprocess/gpqa_diamond.json', 'r', encoding='utf-8') as f:
+    with open('./data_preprocess/orz_math500.json', 'r', encoding='utf-8') as f:
         raw_data = json.load(f)
     
     dataset = datasets.Dataset.from_list(raw_data)
