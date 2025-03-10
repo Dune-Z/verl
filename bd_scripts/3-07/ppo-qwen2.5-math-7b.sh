@@ -43,9 +43,9 @@ python3 -m verl.trainer.main_ppo \
     algorithm.reward_offset=0 \
     algorithm.adv_estimator=gae \
     algorithm.kl_ctrl.kl_coef=0.001 \
-    reward_model.reward_manager=my_reward \
+    reward_model.reward_manager=prime \
     data.custom_temp_dir=$HOME/tmp/ray/  \
-    data.train_files=./data/combined/train.parquet \
+    data.train_files=./data/orz_dataset/train.parquet \
     data.val_files=./data/combined/test.parquet \
     data.train_batch_size=512 \
     data.val_batch_size=512 \

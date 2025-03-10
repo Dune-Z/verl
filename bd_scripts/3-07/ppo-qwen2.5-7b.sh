@@ -36,6 +36,8 @@ python3 data_preprocess/combine_parquet.py --data_dirs ${DATA_PATHS[@]} --output
 python3 data_preprocess/combine_parquet.py --data_dirs ./data/prime --output_dir ./data/combined --split train
 
 
+python3 data_preprocess/orz_dataset.py --local_dir ./data/orz_dataset
+
 export HYDRA_FULL_ERROR=1
 export VLLM_ATTENTION_BACKEND=XFORMERS
 python3 -m verl.trainer.main_ppo \
