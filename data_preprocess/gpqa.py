@@ -23,20 +23,17 @@ def make_prefix(question):
     return prefix
 
 def make_format(example, idx):
-    messages = example['messages']
-    human_message = messages[0]
-    assistant_message = messages[1]
-    
-    question = human_message["value"]
-    question = question + " " + "Let's think step by step and output the final answer within \\boxed{}."
+    question = example["prompt"][0]["value"]
+    answer = example["final_answer"]
+
+    question =question + " " + "Let's think step by step and output the final answer within \\boxed{}."
     question = make_prefix(question)
-    answer = assistant_message["ground_truth"]["value"]
         
     data = {
         "data_source": "gpqa_diamond",
         "prompt": [{
             "role": "user",
-            "content": question
+            "content": question,
         }],
         "ability": "math",
         "reward_model": {
@@ -45,7 +42,7 @@ def make_format(example, idx):
         },
         "extra_info": {
             "index": idx,
-            "split": "train"
+            "split": "test"
         }
     }
     return data
@@ -62,11 +59,10 @@ def main():
     print("Loading the local dataset...", flush=True)
     from pathlib import Path
 
-    with open('./data_preprocess/orz_math_57k_collected.json', 'r', encoding='utf-8') as f:
+    with open('./data_preprocess/gpqa_diamond.json', 'r', encoding='utf-8') as f:
         raw_data = json.load(f)
     
-    formatted_data = [{"messages": item} for item in raw_data]
-    dataset = datasets.Dataset.from_list(formatted_data)
+    dataset = datasets.Dataset.from_list(raw_data)
 
     dataset = dataset.select(range(args.sample_start_idx, min(args.sample_end_idx, len(dataset))))
     
@@ -76,7 +72,7 @@ def main():
     local_dir = args.local_dir
     hdfs_dir = args.hdfs_dir
 
-    mapped_dataset.to_parquet(os.path.join(local_dir, 'train.parquet'))
+    mapped_dataset.to_parquet(os.path.join(local_dir, 'test.parquet'))
 
     if hdfs_dir is not None:
         makedirs(hdfs_dir)
