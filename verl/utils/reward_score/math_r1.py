@@ -14,7 +14,7 @@
 # Adapted from https://github.com/EleutherAI/lm-evaluation-harness/blob/main/lm_eval/tasks/hendrycks_math/utils.py
 import random
 import re
-
+import copy
 def extract_solution(solution_str):
     """Extract the equation from the solution string."""
     # Remove everything before the first "Assistant:"
@@ -53,12 +53,12 @@ def compute_score_val(solution_str, ground_truth) -> float:
             print(f"--------------------------------")
             print(f"Solution string: {solution_str}")
             print(f"Ground Truth: {ground_truth}")
-
+        solution_str_old = copy.deepcopy(solution_str)
         solution_str_extracted = extract_solution(solution_str)
-        if not solution_str:
+        if not solution_str_extracted:
             if do_print:
                 print("Wrong format")
-            solution_str_extracted = solution_str
+            solution_str_extracted = solution_str_old
         string_in_last_boxed = last_boxed_only_string(solution_str_extracted)
         if string_in_last_boxed is not None:
             # retval = 0.1
