@@ -46,14 +46,14 @@ def add_token_length(example):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--raw_data_dir', default=None)
-    parser.add_argument('--local_dir', default='~/data/math')
+    parser.add_argument('--local_dir', default='data/aime_train')
     parser.add_argument('--hdfs_dir', default=None)
 
     args = parser.parse_args()
 
     data_source = 'AIME_train'
-
-    dataset = datasets.load_dataset("json", data_files=args.raw_data_dir)
+    dataset = datasets.load_dataset("AI-MO/aimo-validation-aime", trust_remote_code=True)
+    dataset = dataset.filter(lambda ex: ex['id'] <60)
 
     train_dataset = dataset['train']
 
@@ -68,7 +68,7 @@ if __name__ == '__main__':
             question = question + ' ' + instruction_following
             question = make_prefix(question)
 
-            solution = example.pop('official_answer')
+            solution = example.pop('answer')
             # solution = extract_solution(answer)
             # issue: "073" (train[15])
             data = {

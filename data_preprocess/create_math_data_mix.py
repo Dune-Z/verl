@@ -8,7 +8,7 @@ def create_mixed_dataset(
     copied_datasets = []
     num_rows = []
     keep_columns = ["data_source", "prompt", "ability", "reward_model", "extra_info"]
-    import pdb;pdb.set_trace()
+    #import pdb;pdb.set_trace()
     datasets = [load_dataset("parquet", data_files=path)['train'].select_columns(keep_columns) for path in dataset_paths]
     for dataset, num_copy in zip(datasets, copies):
         n_dataset =concatenate_datasets([dataset] * num_copy)
@@ -21,9 +21,9 @@ def create_mixed_dataset(
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--local_dir', default='~/data/train.parquet')
+    parser.add_argument('--local_dir', default='data/train.parquet')
     dataset_list = [
-        "data/math_500_r1/train.parquet",
+        "data/math_dataset/train.parquet",
         "data/aime_train/train.parquet",
         "data/still_30k_train/train.parquet"
     ]

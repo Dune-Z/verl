@@ -27,7 +27,7 @@ def extract_solution(solution_str):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--local_dir', default='~/data/math')
+    parser.add_argument('--local_dir', default='data/math_dataset')
     parser.add_argument('--hdfs_dir', default=None)
     parser.add_argument("--sample_start_idx", default=0, type=int)
     parser.add_argument("--sample_end_idx", default=999999999, type=int)

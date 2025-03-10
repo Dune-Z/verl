@@ -43,9 +43,9 @@ def add_token_length(example):
     example["prompt_length"] = len(tokenized["input_ids"])
     return example
 
-if __name__ == '__main__':
+def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--local_dir', default='~/data/math')
+    parser.add_argument('--local_dir', default='data/still_30k_train')
     parser.add_argument('--hdfs_dir', default=None)
 
     args = parser.parse_args()
@@ -53,7 +53,12 @@ if __name__ == '__main__':
     data_source = 'RUC-AIBOX/STILL-3-Preview-RL-Data'
 
     dataset = datasets.load_dataset(data_source)
+    from pathlib import Path
 
+    file_path = Path(os.path.join(args.local_dir, 'train.parquet'))
+    if file_path.exists() and file_path.suffix == ".parquet":
+        print("file existed")
+        return
     train_dataset = dataset['train']
 
     instruction_following = "Let's think step by step and output the final answer within \\boxed{}."
@@ -104,3 +109,4 @@ if __name__ == '__main__':
         makedirs(hdfs_dir)
 
         copy(src=local_dir, dst=hdfs_dir)
+main()

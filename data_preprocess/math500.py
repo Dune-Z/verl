@@ -43,7 +43,7 @@ def make_format(example, question_key, answer_key):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--local_dir', default='~/data/math')
+    parser.add_argument('--local_dir', default='data/math500')
     parser.add_argument('--hdfs_dir', default=None)
     parser.add_argument("--sample_start_idx", default=0, type=int)
     parser.add_argument("--sample_end_idx", default=999999999, type=int)
