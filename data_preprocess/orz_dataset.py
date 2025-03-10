@@ -20,37 +20,30 @@ import json
 
 
 def make_format(example, idx):
-    # example now is a dictionary with a 'messages' key
     messages = example['messages']
     human_message = messages[0]
     assistant_message = messages[1]
     
-    question = human_message.get('value', None) if human_message.get('from') == 'human' else None
-    
-    answer = None
-    if assistant_message.get('from') == 'assistant':
-        ground_truth = assistant_message.get('ground_truth', None)
-        if isinstance(ground_truth, dict):
-            answer = ground_truth.get('value', None)
-    
-    if not question or not answer:
-        return None
+    question = human_message["value"]
+    answer = assistant_message["ground_truth"]["value"]
         
-    return {
+    data = {
         "data_source": "orz_dataset",
-        "prompt": [
-            {"content": question + " " + "Let's think step by step and output the final answer within \\boxed{}.", "role": "user"}
-        ],
+        "prompt": [{
+            "role": "user",
+            "content": question + " " + "Let's think step by step and output the final answer within \\boxed{}.",
+        }],
         "ability": "math",
         "reward_model": {
-            "ground_truth": answer,
             "style": "rule",
+            "ground_truth": answer
         },
         "extra_info": {
             "index": idx,
             "split": "train"
         }
     }
+    return data
 
 def main():
     parser = argparse.ArgumentParser()
@@ -75,17 +68,16 @@ def main():
     
     formatted_data = [{"messages": item} for item in raw_data]
     dataset = datasets.Dataset.from_list(formatted_data)
-    
-    train_dataset = dataset
-    train_dataset = train_dataset.select(range(args.sample_start_idx, min(args.sample_end_idx, len(train_dataset))))
-    
-    train_dataset = train_dataset.map(make_format, with_indices=True)
 
-    print(f"len of training dataset is {len(train_dataset)}")
+    dataset = dataset.select(range(args.sample_start_idx, min(args.sample_end_idx, len(dataset))))
+    
+    mapped_dataset = dataset.map(function=make_format, with_indices=True, remove_columns=dataset.column_names)
+
+    print(f"len of training dataset is {len(mapped_dataset)}")
     local_dir = args.local_dir
     hdfs_dir = args.hdfs_dir
 
-    train_dataset.to_parquet(os.path.join(local_dir, 'train.parquet'))
+    mapped_dataset.to_parquet(os.path.join(local_dir, 'train.parquet'))
 
     if hdfs_dir is not None:
         makedirs(hdfs_dir)
