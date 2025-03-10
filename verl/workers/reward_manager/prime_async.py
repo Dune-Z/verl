@@ -15,7 +15,7 @@
 import asyncio
 from concurrent.futures import ProcessPoolExecutor
 from functools import partial
-
+from multiprocessing import cpu_count
 import torch
 
 from verl import DataProto
@@ -112,7 +112,7 @@ class PrimeRewardManager:
                                              response_str,
                                              ground_truth,
                                              data_sources,
-                                             num_processes=64))
+                                             num_processes=min(cpu_count()// 2, 16)))
         except asyncio.TimeoutError as e:
             print('Global timeout in reward computing! Setting all as 0.')
             scores = [0. for _ in range(len(response_str))]

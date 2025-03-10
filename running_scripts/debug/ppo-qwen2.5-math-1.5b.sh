@@ -1,14 +1,14 @@
-export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
+export CUDA_VISIBLE_DEVICES=3,4,5,6
 export WANDB_API_KEY=d61cd005c38e0e1e27d921c951303410316ac718
 wandb login --relogin $WANDB_API_KEY
 ### task name can be selected from [gsm8k, math_dataset, opencoder]
-TASK_NAMES=("prime" "math500")
+TASK_NAMES=("prime" "math500" "math_dataset")
 # comment START_IDX and END_IDX if you want to use the whole dataset for the training
 sft_loss_coef=0
 REMOTE_DATA_PATH=PRIME-RL/Eurus-2-RL-Data
 SAVE_LOCAL_DIR_PREFIX='checkpoints/'
-PROJECT_NAME=Qwen2.5-Math-1.5B
-MODEL_NAME=Qwen/Qwen2.5-Math-1.5B
+PROJECT_NAME=debug
+MODEL_NAME=Qwen/Qwen2.5-0.5B-Instruct
 EXPERIMENT_NAME=ppo
 SAVE_LOCAL_DIR=${SAVE_LOCAL_DIR_PREFIX}${PROJECT_NAME}/${EXPERIMENT_NAME}
 
@@ -75,7 +75,7 @@ python3 -m verl.trainer.main_ppo \
     trainer.project_name=${PROJECT_NAME} \
     trainer.experiment_name=${EXPERIMENT_NAME} \
     trainer.default_local_dir=${SAVE_LOCAL_DIR} \
-    trainer.n_gpus_per_node=8 \
+    trainer.n_gpus_per_node=4 \
     trainer.nnodes=1 \
     trainer.save_freq=15 \
     trainer.test_freq=15 \
