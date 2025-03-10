@@ -43,23 +43,17 @@ def add_token_length(example):
     example["prompt_length"] = len(tokenized["input_ids"])
     return example
 
-def main():
+if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--local_dir', default='data/math_r1_dataset')
+    parser.add_argument('--local_dir', default='data/math_r1_500')
     parser.add_argument('--hdfs_dir', default=None)
 
     args = parser.parse_args()
-    from pathlib import Path
 
-    file_path = Path(os.path.join(args.local_dir, 'train.parquet'))
-    if file_path.exists() and file_path.suffix == ".parquet":
-        print("file existed")
-        return
-    data_source = 'DigitalLearningGmbH/MATH-lighteval-r1'
+    data_source = 'math-500-r1'
 
-    dataset = datasets.load_dataset('DigitalLearningGmbH/MATH-lighteval', trust_remote_code=True)
+    dataset = datasets.load_dataset('HuggingFaceH4/MATH-500', trust_remote_code=True)
 
-    train_dataset = dataset['train']
     test_dataset = dataset['test']
 
     instruction_following = "Let's think step by step and output the final answer within \\boxed{}."
@@ -95,25 +89,23 @@ def main():
 
         return process_fn
 
-    train_dataset = train_dataset.map(function=make_map_fn('train'), with_indices=True)
     test_dataset = test_dataset.map(function=make_map_fn('test'), with_indices=True)
 
-    merged_dataset = datasets.concatenate_datasets([train_dataset, test_dataset])
-    merged_dataset = merged_dataset.filter(filter_level, keep_in_memory=True)
-    merged_dataset = merged_dataset.map(add_token_length, num_proc=32, keep_in_memory=True)
-    max_length = 256
-    merged_dataset = merged_dataset.filter(lambda example: example["prompt_length"] <= max_length)
-    merged_dataset = merged_dataset.remove_columns("prompt_length")
+    #merged_dataset = datasets.concatenate_datasets([train_dataset, test_dataset])
+   # merged_dataset = merged_dataset.filter(filter_level, keep_in_memory=True)
+    #merged_dataset = merged_dataset.map(add_token_length, num_proc=32, keep_in_memory=True)
+    #max_length = 256
+    #merged_dataset = merged_dataset.filter(lambda example: example["prompt_length"] <= max_length)
+    #merged_dataset = merged_dataset.remove_columns("prompt_length")
 
     local_dir = args.local_dir
     hdfs_dir = args.hdfs_dir
 
     # train_dataset.to_parquet(os.path.join(local_dir, 'train.parquet'))
     # test_dataset.to_parquet(os.path.join(local_dir, 'test.parquet'))
-    merged_dataset.to_parquet(os.path.join(local_dir, 'train.parquet'))
+    test_dataset.to_parquet(os.path.join(local_dir, 'test.parquet'))
 
     if hdfs_dir is not None:
         makedirs(hdfs_dir)
 
         copy(src=local_dir, dst=hdfs_dir)
-main()

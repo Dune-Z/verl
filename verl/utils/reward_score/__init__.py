@@ -33,7 +33,7 @@ def _default_compute_score(data_source, solution_str, ground_truth, extra_info=N
     elif data_source in ["math_500_train", "AIME_train", "RUC-AIBOX/STILL-3-Preview-RL-Data"]:
         from . import math_r1
         return math_r1.compute_score(solution_str, ground_truth)
-    elif data_source in ["AIME24", "math_500_test"]:
+    elif data_source in ["AIME24", "math-500-r1", "DigitalLearningGmbH/MATH-lighteval-r1"]:
         from . import math_r1
         return math_r1.compute_score_val(solution_str, ground_truth)
     elif "multiply" in data_source or "arithmetic" in data_source:

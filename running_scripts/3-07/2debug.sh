@@ -1,6 +1,5 @@
 
-
-export EXPERIMENT_NAME=qwen-7b-math-606
+export CUDA_VISIBLE_DEVICES=5,6,7,8
 export VLLM_ATTENTION_BACKEND=XFORMERS
 
 export WANDB_API_KEY=d61cd005c38e0e1e27d921c951303410316ac718
@@ -11,10 +10,10 @@ REMOTE_DATA_PATH=PRIME-RL/Eurus-2-RL-Data
 
 
 SAVE_LOCAL_DIR_PREFIX='checkpoints/'
-PROJECT_NAME=Qwen2.5-7B_Mix-Math
-MODEL_NAME=Qwen/Qwen2.5-7B
+PROJECT_NAME=debug
+MODEL_NAME=Qwen/Qwen2.5-Math-7B-Instruct
 EXPERIMENT_NAME=grpo
-SAVE_LOCAL_DIR=/checkpoints/hongpaul-sandbox/r1/${PROJECT_NAME}/${EXPERIMENT_NAME}
+SAVE_LOCAL_DIR=checkpoints/
 
 python3 data_preprocess/math_r1_dataset.py
 python3 data_preprocess/still_30k.py
@@ -31,7 +30,7 @@ python3 -m verl.trainer.main_ppo \
         data.train_batch_size=512 \
         data.val_batch_size=640 \
         data.max_prompt_length=512 \
-        data.max_response_length=8192 \
+        data.max_response_length=3500 \
         actor_rollout_ref.model.path=$MODEL_NAME \
         actor_rollout_ref.actor.optim.lr=1e-6 \
         actor_rollout_ref.model.use_remove_padding=True \
@@ -42,8 +41,9 @@ python3 -m verl.trainer.main_ppo \
         actor_rollout_ref.actor.kl_loss_type=low_var_kl \
         actor_rollout_ref.model.enable_gradient_checkpointing=True \
         actor_rollout_ref.actor.fsdp_config.param_offload=False \
+        actor_rollout_ref.actor.fsdp_config.optimizer_offload=False \
         actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=32 \
-        actor_rollout_ref.rollout.tensor_model_parallel_size=1 \
+        actor_rollout_ref.rollout.tensor_model_parallel_size=2 \
         actor_rollout_ref.rollout.gpu_memory_utilization=0.6 \
         actor_rollout_ref.rollout.n=6 \
         actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=32 \
@@ -54,7 +54,7 @@ python3 -m verl.trainer.main_ppo \
         trainer.project_name=${PROJECT_NAME} \
         trainer.experiment_name=${EXPERIMENT_NAME} \
         trainer.default_local_dir=${SAVE_LOCAL_DIR} \
-        trainer.n_gpus_per_node=8 \
+        trainer.n_gpus_per_node=4 \
         trainer.nnodes=1 \
         trainer.save_freq=60 \
         trainer.test_freq=20 \

@@ -23,7 +23,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--local_dir', default='data/train.parquet')
     dataset_list = [
-        "data/math_dataset/train.parquet",
+        "data/math_r1_dataset/train.parquet",
         "data/aime_train/train.parquet",
         "data/still_30k_train/train.parquet"
     ]

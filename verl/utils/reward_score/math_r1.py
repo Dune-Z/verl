@@ -54,12 +54,12 @@ def compute_score_val(solution_str, ground_truth) -> float:
             print(f"Solution string: {solution_str}")
             print(f"Ground Truth: {ground_truth}")
 
-        solution_str = extract_solution(solution_str)
+        solution_str_extracted = extract_solution(solution_str)
         if not solution_str:
             if do_print:
                 print("Wrong format")
-            return retval
-        string_in_last_boxed = last_boxed_only_string(solution_str)
+            solution_str_extracted = solution_str
+        string_in_last_boxed = last_boxed_only_string(solution_str_extracted)
         if string_in_last_boxed is not None:
             # retval = 0.1
             answer = remove_boxed(string_in_last_boxed)
