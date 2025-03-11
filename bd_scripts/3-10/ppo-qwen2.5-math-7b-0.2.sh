@@ -54,8 +54,8 @@ python3 -m verl.trainer.main_ppo \
     data.val_files=./data/combined/test.parquet \
     data.train_batch_size=1024 \
     data.val_batch_size=512 \
-    data.max_prompt_length=1024 \
-    data.max_response_length=4096 \
+    data.max_prompt_length=512 \
+    data.max_response_length=3500 \
     actor_rollout_ref.model.path=${MODEL_NAME} \
     actor_rollout_ref.model.use_remove_padding=True \
     actor_rollout_ref.model.enable_gradient_checkpointing=True \
@@ -71,14 +71,16 @@ python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.rollout.name=vllm \
     actor_rollout_ref.rollout.gpu_memory_utilization=0.6 \
     actor_rollout_ref.rollout.n=1 \
-    actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=32 \
-    actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=32 \
+    actor_rollout_ref.actor.use_dynamic_bsz=True \
+    actor_rollout_ref.actor.ppo_max_token_len_per_gpu=24000 \
+    actor_rollout_ref.rollout.log_prob_max_token_len_per_gpu=24000 \
+    actor_rollout_ref.ref.log_prob_max_token_len_per_gpu=24000 \
     actor_rollout_ref.ref.fsdp_config.param_offload=True \
     critic.optim.lr=1e-5 \
     critic.model.use_remove_padding=True \
     critic.model.path=${MODEL_NAME} \
     critic.model.enable_gradient_checkpointing=True \
-    critic.ppo_micro_batch_size_per_gpu=16 \
+    critic.ppo_max_token_len_per_gpu=72000 \
     critic.model.fsdp_config.param_offload=False \
     critic.model.fsdp_config.optimizer_offload=False \
     trainer.critic_warmup=0 \
@@ -89,5 +91,4 @@ python3 -m verl.trainer.main_ppo \
     trainer.n_gpus_per_node=8 \
     trainer.nnodes=1 \
     trainer.save_freq=15 \
-    trainer.test_freq=15 \
-    trainer.total_epochs=1 $@
+    trainer.test_freq=15
