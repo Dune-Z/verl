@@ -67,7 +67,7 @@ def main():
     dataset = dataset.select(range(args.sample_start_idx, min(args.sample_end_idx, len(dataset))))
     
     mapped_dataset = dataset.map(function=make_format, with_indices=True, remove_columns=dataset.column_names)
-
+    print(mapped_dataset[0])
     print(f"len of training dataset is {len(mapped_dataset)}")
     local_dir = args.local_dir
     hdfs_dir = args.hdfs_dir

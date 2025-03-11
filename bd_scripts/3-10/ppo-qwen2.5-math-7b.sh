@@ -1,14 +1,14 @@
-# wget -qO- https://astral.sh/uv/install.sh | sh
-# uv venv briter --python 3.11 && source briter/bin/activate && uv pip install --upgrade pip --link-mode=copy
-# uv pip install -r requirements.txt --link-mode=copy
-# uv pip install flash_attn --no-build-isolation --link-mode=copy
-# uv uninstall wandb
-# uv pip install wandb --no-cache-dir --link-mode=copy
-# uv pip install math_verify --no-build-isolation --link-mode=copy
-# export WANDB_API_KEY=6f9e1eaf73cd08b4f0cd4674c7856201f2453428
-# wandb login --relogin $WANDB_API_KEY
+wget -qO- https://astral.sh/uv/install.sh | sh
+uv venv briter --python 3.11 && source briter/bin/activate && uv pip install --upgrade pip --link-mode=copy
+uv pip install -r requirements.txt --link-mode=copy
+uv pip install flash_attn --no-build-isolation --link-mode=copy
+uv uninstall wandb
+uv pip install wandb --no-cache-dir --link-mode=copy
+uv pip install math_verify --no-build-isolation --link-mode=copy
+export WANDB_API_KEY=6f9e1eaf73cd08b4f0cd4674c7856201f2453428
+wandb login --relogin $WANDB_API_KEY
 
-TASK_NAMES=("aime_24_dataset" "math500" "gpqa_diamond")
+TASK_NAMES=("orz_aime2024" "orz_gpqa_diamond" "orz_math500")
 
 # comment START_IDX and END_IDX if you want to use the whole dataset for the training
 sft_loss_coef=0
@@ -18,6 +18,7 @@ PROJECT_NAME=Qwen2.5-Math-7B
 MODEL_NAME=Qwen/Qwen2.5-Math-7B
 EXPERIMENT_NAME=ppo
 SAVE_LOCAL_DIR=${SAVE_LOCAL_DIR_PREFIX}${PROJECT_NAME}/${EXPERIMENT_NAME}
+
 
 ### preprocess the dataset
 DATA_PATHS=()
@@ -35,11 +36,12 @@ for TASK_NAME in "${TASK_NAMES[@]}"; do
 done
 echo "Combined tasks: ${TASK_NAMES[@]}"
 python3 data_preprocess/combine_parquet.py --data_dirs ${DATA_PATHS[@]} --output_dir ./data/combined
-python3 data_preprocess/combine_parquet.py --data_dirs ./data/prime --output_dir ./data/combined --split train
 
+python3 data_preprocess/orz_dataset.py --local_dir ./data/orz_dataset
 
 export HYDRA_FULL_ERROR=1
 export VLLM_ATTENTION_BACKEND=XFORMERS
+
 python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.actor.sft_loss_coef=${sft_loss_coef} \
     algorithm.reward_scale=1. \
@@ -48,7 +50,7 @@ python3 -m verl.trainer.main_ppo \
     algorithm.kl_ctrl.kl_coef=0.001 \
     reward_model.reward_manager=prime \
     data.custom_temp_dir=$HOME/tmp/ray/  \
-    data.train_files=./data/combined/train.parquet \
+    data.train_files=./data/orz_dataset/train.parquet \
     data.val_files=./data/combined/test.parquet \
     data.train_batch_size=1024 \
     data.val_batch_size=512 \
