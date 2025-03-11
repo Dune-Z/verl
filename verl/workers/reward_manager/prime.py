@@ -17,7 +17,7 @@ import multiprocessing
 import warnings
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from verl import DataProto
-from verl.utils.reward_score import _default_compute_score
+from verl.utils.reward_score import _default_compute_score, val_compute_score
 from multiprocessing import cpu_count
 
 
@@ -97,6 +97,7 @@ class PrimeRewardManager:
         self.tokenizer = tokenizer
         self.num_examine = num_examine  # the number of batches of decoded responses to print to the console
         self.compute_score = compute_score or _default_compute_score
+        self.val_compute_score = val_compute_score
         self.scale = scale
         self.offset = offset
 
@@ -123,7 +124,12 @@ class PrimeRewardManager:
         num_processes = min(cpu_count()// 2, 16)
         assert len(sequences_str) == len(ground_truth) == len(data_sources)
 
-        scores = parallel_compute_score(self.compute_score, sequences_str, ground_truth, data_sources, num_processes=num_processes)
+        if self.num_examine == 0:
+            scores = parallel_compute_score(self.compute_score, sequences_str, ground_truth, data_sources, num_processes=num_processes)
+        elif self.num_examine == 1:
+            scores = parallel_compute_score(self.val_compute_score, sequences_str, ground_truth, data_sources, num_processes=num_processes)
+        else:
+            raise ValueError(f"num_examine must be 0 or 1, but got {self.num_examine}")
 
         for i in range(len(data)):
             data_source = data_sources[i]
