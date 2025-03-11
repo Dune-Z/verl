@@ -1,4 +1,11 @@
-
+wget -qO- https://astral.sh/uv/install.sh | sh
+uv venv briter --python 3.11 && source briter/bin/activate && uv pip install --upgrade pip --link-mode=copy
+uv pip install -r requirements.txt --link-mode=copy
+uv pip install flash_attn --no-build-isolation --link-mode=copy
+uv uninstall wandb
+uv pip install wandb --no-cache-dir --link-mode=copy
+export WANDB_API_KEY=d61cd005c38e0e1e27d921c951303410316ac718
+wandb login --relogin $WANDB_API_KEY
 
 export EXPERIMENT_NAME=qwen-7b-math-606
 export VLLM_ATTENTION_BACKEND=XFORMERS
