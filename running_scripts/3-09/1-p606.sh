@@ -2,7 +2,7 @@
 
 export EXPERIMENT_NAME=qwen-7b-math-606
 export VLLM_ATTENTION_BACKEND=XFORMERS
-
+export HYDRA_FULL_ERROR=1
 export WANDB_API_KEY=d61cd005c38e0e1e27d921c951303410316ac718
 wandb login --relogin $WANDB_API_KEY
 
@@ -26,6 +26,7 @@ python3 data_preprocess/math_r1_500.py
 python3 -m verl.trainer.main_ppo \
         actor_rollout_ref.actor.sft_loss_coef=${sft_loss_coef} \
         algorithm.adv_estimator=grpo \
+        data.custom_temp_dir=$HOME/tmp/ray/  \
         data.train_files=data/train.parquet \
         data.val_files=['data/aime_2024/test.parquet','data/math_r1_500/test.parquet'] \
         data.train_batch_size=512 \
