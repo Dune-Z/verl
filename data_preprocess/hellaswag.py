@@ -20,7 +20,7 @@ import re
 import os
 import datasets
 
-from verl.utils.hdfs_io import copy, makedirs
+from utils import remove_boxed, last_boxed_only_string, copy, makedirs
 import argparse
 
 

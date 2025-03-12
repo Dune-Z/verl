@@ -24,7 +24,7 @@ from datasets import load_dataset
 
 from tqdm.auto import tqdm
 
-from verl.utils.fs import copy, makedirs
+from utils import remove_boxed, last_boxed_only_string, copy, makedirs
 
 
 def generate_sft_dataset(target_hdfs_path_dir, local_dir='~/data/full_hh_rlh/sft'):

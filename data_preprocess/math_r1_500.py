@@ -17,12 +17,9 @@ Preprocess the GSM8k dataset to parquet format
 
 import os
 import datasets
-
-from transformers import AutoTokenizer
-from verl.utils.hdfs_io import copy, makedirs
 import argparse
-
-from verl.utils.reward_score.math import remove_boxed, last_boxed_only_string
+from transformers import AutoTokenizer
+from utils import remove_boxed, last_boxed_only_string, copy, makedirs
 
 
 def extract_solution(solution_str):

@@ -8,7 +8,7 @@ from datasets import Dataset, load_dataset
 from random import randint, seed, choice
 from typing import List, Tuple
 from tqdm import tqdm
-from verl.utils.hdfs_io import copy, makedirs
+from utils import remove_boxed, last_boxed_only_string, copy, makedirs
 import argparse
 
 
