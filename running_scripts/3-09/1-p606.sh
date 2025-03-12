@@ -14,13 +14,20 @@ MODEL_NAME=Qwen/Qwen2.5-7B
 EXPERIMENT_NAME=grpo
 SAVE_LOCAL_DIR=/checkpoints/hongpaul-sandbox/r1/${PROJECT_NAME}/${EXPERIMENT_NAME}
 
+echo "Processing task: math_r1_dataset"
 python3 data_preprocess/math_r1_dataset.py
+echo "Processing task: still_30k"
 python3 data_preprocess/still_30k.py
+echo "Processing task: aime_train_dataset"
 python3 data_preprocess/aime_train_dataset.py
+echo "Processing task: create_math_data_mix"
 python3 data_preprocess/create_math_data_mix.py
+echo "Processing task: aime_24_dataset"
 python3 data_preprocess/aime_24_dataset.py
+echo "Processing task: math_r1_500"
 python3 data_preprocess/math_r1_500.py
 
+echo "start training"
 python3 -m verl.trainer.main_ppo \
         actor_rollout_ref.actor.sft_loss_coef=${sft_loss_coef} \
         algorithm.adv_estimator=grpo \
