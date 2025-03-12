@@ -42,7 +42,7 @@ python3 data_preprocess/orz_dataset.py --local_dir ./data/orz_dataset
 export HYDRA_FULL_ERROR=1
 export VLLM_ATTENTION_BACKEND=XFORMERS
 
-python3 -m verl.trainer.main_ppo \
+python3 -m verl.trainer.main_ppo_noref \
     actor_rollout_ref.actor.sft_loss_coef=${sft_loss_coef} \
     algorithm.reward_scale=1. \
     algorithm.reward_offset=0 \
