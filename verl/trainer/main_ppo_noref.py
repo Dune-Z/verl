@@ -74,7 +74,7 @@ def main_task(config, compute_score=None):
     role_worker_mapping = {
         Role.ActorRollout: ray.remote(ActorRolloutRefWorker),
         Role.Critic: ray.remote(CriticWorker),
-        Role.RefPolicy: ray.remote(ActorRolloutRefWorker)
+        # Role.RefPolicy: ray.remote(ActorRolloutRefWorker)
     }
 
     global_pool_id = 'global_pool'
@@ -84,7 +84,7 @@ def main_task(config, compute_score=None):
     mapping = {
         Role.ActorRollout: global_pool_id,
         Role.Critic: global_pool_id,
-        # Role.RefPolicy: global_pool_id,
+        Role.RefPolicy: global_pool_id,
     }
 
     # we should adopt a multi-source reward function here
