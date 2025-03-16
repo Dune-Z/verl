@@ -175,7 +175,20 @@ class vLLMRollout(BaseRollout):
                 'temperature': 0,
                 'n': 1  # if greedy, only 1 response
             }
-
+        n = prompts.meta_info.get('n', -1)
+        if n < 1:
+            n =  self.config.n
+        if not do_sample:
+            kwargs = {
+                'best_of': 1,
+                'top_p': 1.0,
+                'top_k': -1,
+                'min_p': 0.0,
+                'temperature': 0,
+                'n': 1  # if greedy, only 1 response
+            }
+        else:
+            kwargs = {'n': n}
         # users can customize different sampling_params at different run
         with self.update_sampling_params(**kwargs):
             outputs = self.inference_engine.generate(
@@ -195,11 +208,11 @@ class vLLMRollout(BaseRollout):
         response = pad_2d_list_to_length(response, self.pad_token_id,
                                          max_length=self.config.response_length).to(idx.device)
 
-        if self.config.n > 1 and do_sample:
-            idx = idx.repeat_interleave(self.config.n, dim=0)
-            attention_mask = attention_mask.repeat_interleave(self.config.n, dim=0)
-            position_ids = position_ids.repeat_interleave(self.config.n, dim=0)
-            batch_size = batch_size * self.config.n
+        if n > 1 and do_sample:
+            idx = idx.repeat_interleave(n, dim=0)
+            attention_mask = attention_mask.repeat_interleave(n, dim=0)
+            position_ids = position_ids.repeat_interleave(n, dim=0)
+            batch_size = batch_size * n
         seq = torch.cat([idx, response], dim=-1)
 
         response_length = response.size(1)
