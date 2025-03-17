@@ -11,13 +11,14 @@ export WANDB_API_KEY=d61cd005c38e0e1e27d921c951303410316ac718
 wandb login --relogin $WANDB_API_KEY
 
 sft_loss_coef=0
+SAMPLING_TIME_TEST=8
 REMOTE_DATA_PATH=PRIME-RL/Eurus-2-RL-Data
 
 
 SAVE_LOCAL_DIR_PREFIX='checkpoints/'
 PROJECT_NAME=Qwen2.5-7B_Mix-Math
 MODEL_NAME=Qwen/Qwen2.5-7B
-EXPERIMENT_NAME=grpo_0_test_sampling16
+EXPERIMENT_NAME=grpo_0_test_gen_8_test_${SAMPLING_TIME_TEST}
 SAVE_LOCAL_DIR=/checkpoints/hongpaul-sandbox/r1/${PROJECT_NAME}/${EXPERIMENT_NAME}
 
 echo "Processing task: math_r1_dataset"
@@ -37,12 +38,12 @@ echo "start training"
 python3 -m verl.trainer.main_ppo \
         actor_rollout_ref.actor.sft_loss_coef=${sft_loss_coef} \
         algorithm.adv_estimator=grpo \
-        trainer.test_sample_n=16 \
+        trainer.test_sample_n=${SAMPLING_TIME_TEST} \
         data.custom_temp_dir=$HOME/tmp/ray/  \
         data.train_files=data/train.parquet \
         data.val_files=['data/aime_2024/test.parquet','data/math_r1_500/test.parquet'] \
         data.train_batch_size=512 \
-        data.val_batch_size=640 \
+        data.val_batch_size=256 \
         data.max_prompt_length=512 \
         data.max_response_length=8192 \
         actor_rollout_ref.model.path=$MODEL_NAME \
@@ -58,7 +59,7 @@ python3 -m verl.trainer.main_ppo \
         actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=32 \
         actor_rollout_ref.rollout.tensor_model_parallel_size=1 \
         actor_rollout_ref.rollout.gpu_memory_utilization=0.6 \
-        actor_rollout_ref.rollout.n=6 \
+        actor_rollout_ref.rollout.n=8 \
         actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=32 \
         actor_rollout_ref.ref.fsdp_config.param_offload=True \
         algorithm.kl_ctrl.kl_coef=0.001 \
@@ -71,4 +72,4 @@ python3 -m verl.trainer.main_ppo \
         trainer.nnodes=1 \
         trainer.save_freq=-1 \
         trainer.test_freq=20 \
-        trainer.total_epochs=2 $@
+        trainer.total_epochs=1 $@
