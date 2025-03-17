@@ -164,7 +164,7 @@ class vLLMRollout(BaseRollout):
         # parse idx from torch.Tensor to List[List[str]]
         for i in range(batch_size):
             idx_list.append(_pre_process_inputs(self.pad_token_id, idx[i]))
-
+        n = prompts.meta_info.get('n', -1)
         do_sample = prompts.meta_info.get('do_sample', True)
         if not do_sample:
             kwargs = {
@@ -175,7 +175,10 @@ class vLLMRollout(BaseRollout):
                 'temperature': 0,
                 'n': 1  # if greedy, only 1 response
             }
-
+        else:
+            kwargs = {'n': n}
+        if prompts.meta_info.get('validate', False):
+            kwargs.update({'logprobs': 0})
         # users can customize different sampling_params at different run
         with self.update_sampling_params(**kwargs):
             output = self.inference_engine.generate(
@@ -193,7 +196,7 @@ class vLLMRollout(BaseRollout):
             response = pad_sequence_to_length(response, self.config.response_length, self.pad_token_id)
             log_probs = pad_sequence_to_length(log_probs, self.config.response_length, self.pad_token_id)
 
-        if self.config.n > 1 and do_sample:
+        if self.config.n > 1 and not prompts.meta_info.get('validate', False):
             idx = idx.repeat_interleave(self.config.n, dim=0)
             attention_mask = attention_mask.repeat_interleave(self.config.n, dim=0)
             position_ids = position_ids.repeat_interleave(self.config.n, dim=0)
