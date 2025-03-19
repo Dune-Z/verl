@@ -18,7 +18,7 @@ REMOTE_DATA_PATH=PRIME-RL/Eurus-2-RL-Data
 SAVE_LOCAL_DIR_PREFIX='checkpoints/'
 PROJECT_NAME=Qwen2.5-7B_Mix-Math
 MODEL_NAME=Qwen/Qwen2.5-7B
-EXPERIMENT_NAME=grpo_${sft_loss_coef}_test_gen_8_test_${SAMPLING_TIME_TEST}
+EXPERIMENT_NAME=ppo_${sft_loss_coef}_test_gen_8_test_${SAMPLING_TIME_TEST}
 SAVE_LOCAL_DIR=/checkpoints/hongpaul-sandbox/r1/${PROJECT_NAME}/${EXPERIMENT_NAME}
 
 echo "Processing task: math_r1_dataset"
@@ -37,7 +37,6 @@ python3 data_preprocess/math_r1_500.py
 echo "start training"
 python3 -m verl.trainer.main_ppo \
         actor_rollout_ref.actor.sft_loss_coef=${sft_loss_coef} \
-        algorithm.adv_estimator=grpo \
         trainer.test_sample_n=${SAMPLING_TIME_TEST} \
         data.custom_temp_dir=$HOME/tmp/ray/  \
         data.train_files=data/train.parquet \
@@ -51,9 +50,6 @@ python3 -m verl.trainer.main_ppo \
         actor_rollout_ref.model.use_remove_padding=True \
         actor_rollout_ref.actor.ppo_mini_batch_size=256 \
         actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=4 \
-        actor_rollout_ref.actor.use_kl_loss=True \
-        actor_rollout_ref.actor.kl_loss_coef=0.001 \
-        actor_rollout_ref.actor.kl_loss_type=low_var_kl \
         actor_rollout_ref.model.enable_gradient_checkpointing=True \
         actor_rollout_ref.actor.fsdp_config.param_offload=False \
         actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=32 \
@@ -63,6 +59,13 @@ python3 -m verl.trainer.main_ppo \
         actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=32 \
         actor_rollout_ref.ref.fsdp_config.param_offload=True \
         algorithm.kl_ctrl.kl_coef=0.001 \
+        critic.optim.lr=1e-5 \
+        critic.model.use_remove_padding=True \
+        critic.model.path=Qwen/Qwen2-7B-Instruct \
+        critic.model.enable_gradient_checkpointing=True \
+        critic.ppo_micro_batch_size_per_gpu=4 \
+        critic.model.fsdp_config.param_offload=False \
+        critic.model.fsdp_config.optimizer_offload=False \
         trainer.logger=['console','wandb'] \
         trainer.default_hdfs_dir=null \
         trainer.project_name=${PROJECT_NAME} \
