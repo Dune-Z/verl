@@ -7,7 +7,7 @@ uv pip install wandb --no-cache-dir --link-mode=copy
 #export EXPERIMENT_NAME=qwen-7b-math-606
 export VLLM_ATTENTION_BACKEND=XFORMERS
 export HYDRA_FULL_ERROR=1
-export WANDB_API_KEY=d61cd005c38e0e1e27d921c951303410316ac718
+export WANDB_API_KEY=6f9e1eaf73cd08b4f0cd4674c7856201f2453428
 wandb login --relogin $WANDB_API_KEY
 
 sft_loss_coef=0.2
