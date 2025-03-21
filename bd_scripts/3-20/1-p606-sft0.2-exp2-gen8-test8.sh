@@ -19,7 +19,7 @@ REMOTE_DATA_PATH=PRIME-RL/Eurus-2-RL-Data
 SAVE_LOCAL_DIR_PREFIX='checkpoints/'
 PROJECT_NAME=Qwen2.5-7B_Mix-Math
 MODEL_NAME=Qwen/Qwen2.5-7B
-EXPERIMENT_NAME=grpo_0_test_gen_8_test_${SAMPLING_TIME_TEST}
+EXPERIMENT_NAME=grpo_${sft_loss_coef}_exp${sft_loss_exp_ceof}_gen_8_test_${SAMPLING_TIME_TEST}
 SAVE_LOCAL_DIR=/checkpoints/hongpaul-sandbox/r1/${PROJECT_NAME}/${EXPERIMENT_NAME}
 
 echo "Processing task: math_r1_dataset"
