@@ -1,7 +1,9 @@
-# git clone https://github.com/Dune-Z/verl.git
-# cd verl
-# git checkout yuanxin
-# wget -qO- https://astral.sh/uv/install.sh | sh
+git clone https://github.com/Dune-Z/verl.git
+cd verl
+git checkout yuanxin
+
+
+wget -qO- https://astral.sh/uv/install.sh | sh
 uv venv briter --python 3.11 && source briter/bin/activate && uv pip install --upgrade pip --link-mode=copy
 uv pip install -r requirements.txt --link-mode=copy
 uv pip install flash_attn --no-build-isolation --link-mode=copy
@@ -11,40 +13,39 @@ uv pip install math_verify --no-build-isolation --link-mode=copy
 export WANDB_API_KEY=6f9e1eaf73cd08b4f0cd4674c7856201f2453428
 wandb login --relogin $WANDB_API_KEY
 
-# TASK_NAMES=("orz_aime2024" "orz_gpqa_diamond" "orz_math500")
+TASK_NAMES=("orz_aime2024" "orz_gpqa_diamond" "orz_math500")
 
-# # comment START_IDX and END_IDX if you want to use the whole dataset for the training
-sft_loss_coef=0
+# comment START_IDX and END_IDX if you want to use the whole dataset for the training
+sft_loss_coef=0.2
 REMOTE_DATA_PATH=PRIME-RL/Eurus-2-RL-Data
 SAVE_LOCAL_DIR_PREFIX='checkpoints/'
-PROJECT_NAME=Qwen2.5-7B
+PROJECT_NAME=Qwen2.5-7B-gen4-sample
 MODEL_NAME=Qwen/Qwen2.5-7B
-EXPERIMENT_NAME=ppo
+EXPERIMENT_NAME=sftloss0.2
 SAVE_LOCAL_DIR=${SAVE_LOCAL_DIR_PREFIX}${PROJECT_NAME}/${EXPERIMENT_NAME}
 
 
-# ### preprocess the dataset
-# DATA_PATHS=()
-# for TASK_NAME in "${TASK_NAMES[@]}"; do
-#     echo "Processing task: $TASK_NAME"
+### preprocess the dataset
+DATA_PATHS=()
+for TASK_NAME in "${TASK_NAMES[@]}"; do
+    echo "Processing task: $TASK_NAME"
     
-#     if [ -z "${START_IDX:-}" ]; then
-#         DATA_PATH_SUFF=${TASK_NAME}
-#         python3 data_preprocess/${TASK_NAME}.py --local_dir ./data/$DATA_PATH_SUFF --data_remote_dir $REMOTE_DATA_PATH
-#     else
-#         DATA_PATH_SUFF=${TASK_NAME}_${START_IDX}_${END_IDX}
-#         python3 data_preprocess/${TASK_NAME}.py --local_dir ./data/$DATA_PATH_SUFF --sample_start_idx $START_IDX --sample_end_idx $END_IDX --data_remote_dir $REMOTE_DATA_PATH
-#     fi
-#     DATA_PATHS+=("./data/$DATA_PATH_SUFF")
-# done
-# echo "Combined tasks: ${TASK_NAMES[@]}"
-# python3 data_preprocess/combine_parquet.py --data_dirs ${DATA_PATHS[@]} --output_dir ./data/combined
+    if [ -z "${START_IDX:-}" ]; then
+        DATA_PATH_SUFF=${TASK_NAME}
+        python3 data_preprocess/${TASK_NAME}.py --local_dir ./data/$DATA_PATH_SUFF --data_remote_dir $REMOTE_DATA_PATH
+    else
+        DATA_PATH_SUFF=${TASK_NAME}_${START_IDX}_${END_IDX}
+        python3 data_preprocess/${TASK_NAME}.py --local_dir ./data/$DATA_PATH_SUFF --sample_start_idx $START_IDX --sample_end_idx $END_IDX --data_remote_dir $REMOTE_DATA_PATH
+    fi
+    DATA_PATHS+=("./data/$DATA_PATH_SUFF")
+done
+echo "Combined tasks: ${TASK_NAMES[@]}"
+python3 data_preprocess/combine_parquet.py --data_dirs ${DATA_PATHS[@]} --output_dir ./data/combined
 
-# python3 data_preprocess/orz_dataset.py --local_dir ./data/orz_dataset
+python3 data_preprocess/orz_dataset.py --local_dir ./data/orz_dataset
 
 export HYDRA_FULL_ERROR=1
 export VLLM_ATTENTION_BACKEND=XFORMERS
-
 
 python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.actor.sft_loss_coef=${sft_loss_coef} \
@@ -57,7 +58,7 @@ python3 -m verl.trainer.main_ppo \
     data.train_files=./data/orz_dataset/train.parquet \
     data.val_files=./data/combined/test.parquet \
     data.train_batch_size=256 \
-    data.val_batch_size=256 \
+    data.val_batch_size=128 \
     data.max_prompt_length=1024 \
     data.max_response_length=8000 \
     actor_rollout_ref.model.path=${MODEL_NAME} \
@@ -87,7 +88,7 @@ python3 -m verl.trainer.main_ppo \
     critic.model.use_remove_padding=True \
     critic.model.path=${MODEL_NAME} \
     critic.model.enable_gradient_checkpointing=True \
-    critic.ppo_mini_batch_size=16 \
+    critic.ppo_mini_batch_size=32 \
     critic.model.fsdp_config.param_offload=False \
     critic.model.fsdp_config.optimizer_offload=False \
     critic.ppo_max_token_len_per_gpu=72000 \
@@ -100,3 +101,4 @@ python3 -m verl.trainer.main_ppo \
     trainer.nnodes=1 \
     trainer.save_freq=-1 \
     trainer.test_freq=60 \
+    trainer.test_sample_n=8 \

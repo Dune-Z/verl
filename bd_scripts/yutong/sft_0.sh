@@ -1,6 +1,8 @@
 # git clone https://github.com/Dune-Z/verl.git
 # cd verl
 # git checkout yuanxin
+
+
 # wget -qO- https://astral.sh/uv/install.sh | sh
 uv venv briter --python 3.11 && source briter/bin/activate && uv pip install --upgrade pip --link-mode=copy
 uv pip install -r requirements.txt --link-mode=copy
@@ -11,19 +13,19 @@ uv pip install math_verify --no-build-isolation --link-mode=copy
 export WANDB_API_KEY=6f9e1eaf73cd08b4f0cd4674c7856201f2453428
 wandb login --relogin $WANDB_API_KEY
 
-# TASK_NAMES=("orz_aime2024" "orz_gpqa_diamond" "orz_math500")
+TASK_NAMES=("orz_aime2024" "orz_gpqa_diamond" "orz_math500")
 
-# # comment START_IDX and END_IDX if you want to use the whole dataset for the training
+# comment START_IDX and END_IDX if you want to use the whole dataset for the training
 sft_loss_coef=0
 REMOTE_DATA_PATH=PRIME-RL/Eurus-2-RL-Data
 SAVE_LOCAL_DIR_PREFIX='checkpoints/'
-PROJECT_NAME=Qwen2.5-7B
+PROJECT_NAME=Qwen2.5-7B-gen4-sample
 MODEL_NAME=Qwen/Qwen2.5-7B
-EXPERIMENT_NAME=ppo
+EXPERIMENT_NAME=sftloss0.2
 SAVE_LOCAL_DIR=${SAVE_LOCAL_DIR_PREFIX}${PROJECT_NAME}/${EXPERIMENT_NAME}
 
 
-# ### preprocess the dataset
+### preprocess the dataset
 # DATA_PATHS=()
 # for TASK_NAME in "${TASK_NAMES[@]}"; do
 #     echo "Processing task: $TASK_NAME"
@@ -45,7 +47,6 @@ SAVE_LOCAL_DIR=${SAVE_LOCAL_DIR_PREFIX}${PROJECT_NAME}/${EXPERIMENT_NAME}
 export HYDRA_FULL_ERROR=1
 export VLLM_ATTENTION_BACKEND=XFORMERS
 
-
 python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.actor.sft_loss_coef=${sft_loss_coef} \
     algorithm.reward_scale=1. \
@@ -56,15 +57,15 @@ python3 -m verl.trainer.main_ppo \
     data.custom_temp_dir=$HOME/tmp/ray/  \
     data.train_files=./data/orz_dataset/train.parquet \
     data.val_files=./data/combined/test.parquet \
-    data.train_batch_size=256 \
-    data.val_batch_size=256 \
+    data.train_batch_size=128 \
+    data.val_batch_size=128 \
     data.max_prompt_length=1024 \
-    data.max_response_length=8000 \
+    data.max_response_length=2048 \
     actor_rollout_ref.model.path=${MODEL_NAME} \
     actor_rollout_ref.model.use_remove_padding=True \
     actor_rollout_ref.model.enable_gradient_checkpointing=True \
     actor_rollout_ref.actor.optim.lr=1e-6 \
-    actor_rollout_ref.actor.ppo_mini_batch_size=256 \
+    actor_rollout_ref.actor.ppo_mini_batch_size=128 \
     actor_rollout_ref.actor.use_kl_loss=False \
     actor_rollout_ref.actor.kl_loss_coef=0 \
     actor_rollout_ref.actor.fsdp_config.param_offload=False \
@@ -74,7 +75,7 @@ python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.rollout.tensor_model_parallel_size=4 \
     actor_rollout_ref.rollout.name=vllm \
     actor_rollout_ref.rollout.gpu_memory_utilization=0.5 \
-    actor_rollout_ref.rollout.n=4 \
+    actor_rollout_ref.rollout.n=1 \
     actor_rollout_ref.ref.fsdp_config.param_offload=True \
     actor_rollout_ref.actor.use_dynamic_bsz=True \
     actor_rollout_ref.actor.ppo_max_token_len_per_gpu=24000 \
@@ -87,7 +88,7 @@ python3 -m verl.trainer.main_ppo \
     critic.model.use_remove_padding=True \
     critic.model.path=${MODEL_NAME} \
     critic.model.enable_gradient_checkpointing=True \
-    critic.ppo_mini_batch_size=16 \
+    critic.ppo_mini_batch_size=32 \
     critic.model.fsdp_config.param_offload=False \
     critic.model.fsdp_config.optimizer_offload=False \
     critic.ppo_max_token_len_per_gpu=72000 \
@@ -100,3 +101,4 @@ python3 -m verl.trainer.main_ppo \
     trainer.nnodes=1 \
     trainer.save_freq=-1 \
     trainer.test_freq=60 \
+    trainer.test_sample_n=1 \
