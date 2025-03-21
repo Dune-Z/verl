@@ -22,6 +22,7 @@ actor_rollout_ref:
   actor:
     strategy: fsdp  # This is for backward-compatibility
     sft_loss_coef: 0 # For BriteR
+    sft_loss_exp_coef: 1 # For BriteR
     ppo_mini_batch_size: 256
     ppo_micro_batch_size: null # will be deprecated, use ppo_micro_batch_size_per_gpu
     ppo_micro_batch_size_per_gpu: null
