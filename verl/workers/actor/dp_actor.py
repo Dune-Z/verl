@@ -30,7 +30,7 @@ from verl.utils.torch_functional import logprobs_from_logits, masked_mean
 from verl.utils.ulysses import ulysses_pad_and_slice_inputs, gather_outpus_and_unpad
 from verl.utils.seqlen_balancing import rearrange_micro_batches, get_reverse_idx
 import verl.utils.torch_functional as verl_F
-
+import json
 from flash_attn.bert_padding import pad_input, unpad_input, rearrange, index_first_axis
 
 __all__ = ['DataParallelPPOActor']
@@ -206,7 +206,7 @@ class DataParallelPPOActor(BasePPOActor):
 
         temperature = data.meta_info['temperature']  # temperature must be in the data.meta_info to avoid slient error
 
-        select_keys = ['responses', 'input_ids', 'attention_mask', 'position_ids', 'old_log_probs', 'advantages']
+        select_keys = ['responses', 'input_ids', 'attention_mask', 'position_ids', 'old_log_probs', 'advantages', 'token_level_scores']
         if self.config.use_kl_loss:
             select_keys.append('ref_log_prob')
         batch = data.select(batch_keys=select_keys).batch
@@ -267,7 +267,14 @@ class DataParallelPPOActor(BasePPOActor):
                     metrics['actor/kl_loss'] = kl_loss.detach().item()
                     metrics['actor/kl_coef'] = self.config.kl_loss_coef
                 if self.config.sft_loss_coef > 1e-8:
-                    sft_loss = - self.config.sft_loss_coef * masked_mean(log_prob, response_mask)
+                    score_original = torch.exp(
+                            (data['token_level_scores'].sum(-1) - 1.0) * self.config.sft_loss_exp_coef
+                        )
+                    # print(f"reward is {data['token_level_scores'].sum(-1)}")
+                    # print(f"score_original is {score_original}")
+                    reward_rescale = score_original.unsqueeze(1).repeat(1, response_length)
+                    # print(f"sft_rewards is {reward_rescale}")
+                    sft_loss = - self.config.sft_loss_coef * masked_mean(reward_rescale * log_prob, response_mask)
                     policy_loss = policy_loss + sft_loss
                 if self.config.use_dynamic_bsz:
                     # relative to the dynamic bsz
@@ -281,7 +288,7 @@ class DataParallelPPOActor(BasePPOActor):
                         'actor/pg_loss': pg_loss.detach().item(),
                         'actor/pg_clipfrac': pg_clipfrac.detach().item(),
                         'actor/ppo_kl': ppo_kl.detach().item(),
-                        'actor/sft_loss': sft_loss.detach().item()
+                        'actor/sft_loss': sft_loss.detach().item(),
                     }
                 else:
                     data = {
