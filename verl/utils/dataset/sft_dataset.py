@@ -85,6 +85,12 @@ class SFTDataset(Dataset):
             dataframes.append(dataframe)
         self.dataframe = pd.concat(dataframes)
         self.prompts = self.dataframe[self.prompt_key]
+        # if isinstance(self.prompt_key, str):
+        #     self.prompts = self.dataframe[self.prompt_key]
+        # elif isinstance(self.prompt_key, (tuple, list)):
+        #     self.prompts = self.dataframe[self.prompt_key[0]]
+        # else:
+        #     raise NotImplementedError(f'Unknown prompt_key type {self.prompt_key=}')
         for key in self.prompt_dict_keys:
             # type(x): pandas.core.series.Series
             # type(x[0]): numpy.ndarray
@@ -96,6 +102,12 @@ class SFTDataset(Dataset):
                 raise
         self.prompts = self.prompts.tolist()
         self.responses = self.dataframe[self.response_key]
+        # if isinstance(self.response_key, str):
+        #     self.responses = self.dataframe[self.response_key]
+        # elif isinstance(self.response_key, (tuple, list)):
+        #     self.responses = self.dataframe[self.response_key[0]]
+        # else:
+        #     raise NotImplementedError(f'Unknown response_key type {self.response_key=}') 
         for key in self.response_dict_keys:
             try:
                 self.responses = self.responses.apply(lambda x: series_to_item(x)[key], axis=1)
