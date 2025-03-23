@@ -19,7 +19,8 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 from verl import DataProto
 from verl.utils.reward_score import _default_compute_score
 from multiprocessing import cpu_count
-
+import warnings
+from typing import Callable, List, Any
 
 def single_compute_score(evaluation_func, completion, reference, task, extra_info, executor):
     try:
@@ -43,8 +44,46 @@ def _safe_evaluation(evaluation_func, task, completion, reference, result_list, 
         print(f"Error processing completion at index {idx}: {e}")
         result_list[idx] = 0.0
 
+def parallel_compute_score(
+    evaluation_func: Callable,
+    completions: List[str],
+    references: List[str],
+    tasks: List[str],
+    num_processes: int = 8,
+    extra_info: Any = None,
+    timeout: int = 10,
+) -> List[float]:
+    manager = multiprocessing.Manager()
+    result_list = manager.list([0.0] * len(completions))  
+    semaphore = multiprocessing.Semaphore(num_processes)  
+    processes = []
 
-def parallel_compute_score(evaluation_func, completions, references, tasks, num_processes=32, extra_info=None, timeout=10):
+    def worker_wrapper(idx: int, completion: str, reference: str, task: str):
+        
+        with semaphore:  
+            p = multiprocessing.Process(
+                target=_safe_evaluation,
+                args=(evaluation_func, task, completion, reference, result_list, idx, extra_info),
+            )
+            p.start()
+            processes.append((p, idx))
+
+    
+    for idx, (completion, reference, task) in enumerate(zip(completions, references, tasks)):
+        worker_wrapper(idx, completion, reference, task)
+
+    
+    for p, idx in processes:
+        p.join(timeout=timeout)
+        if p.is_alive():
+            warnings.warn(f"Timeout when processing completion at index {idx}")
+            p.kill()
+            p.join()
+
+    return list(result_list)
+
+
+def parallel_compute_score_old(evaluation_func, completions, references, tasks, num_processes=32, extra_info=None, timeout=10):
     manager = multiprocessing.Manager()
     result_list = manager.list([0.0] * len(completions))
     processes = []
@@ -120,7 +159,7 @@ class PrimeRewardManager:
         sequences_str = self.tokenizer.batch_decode(response_ids, skip_special_tokens=True)
         ground_truth = [data_item.non_tensor_batch['reward_model']['ground_truth'] for data_item in data]
         data_sources = data.non_tensor_batch['data_source']
-        num_processes = min(cpu_count()// 2, 16)
+        num_processes = min(cpu_count()// 2, 128)
         assert len(sequences_str) == len(ground_truth) == len(data_sources)
 
         scores = parallel_compute_score(self.compute_score, sequences_str, ground_truth, data_sources, num_processes=num_processes)
