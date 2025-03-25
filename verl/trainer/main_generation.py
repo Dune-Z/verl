@@ -68,20 +68,21 @@ def main(config):
     # real_batch_size = data.batch['input_ids'].shape[0]
     config_batch_size = config.data.batch_size
     dp_size = wg.world_size // config.rollout.tensor_model_parallel_size
-    num_batch = (total_samples // config_batch_size) + 1
+    num_batch = -(-total_samples // config_batch_size)
     output_lst = [[] for _ in range(config.data.n_samples)]
 
     for batch_idx in range(num_batch):
         print(f'[{batch_idx+1}/{num_batch}] Start to process.')
         batch_chat_lst = chat_lst[batch_idx * config_batch_size:(batch_idx + 1) * config_batch_size]
         inputs = tokenizer.apply_chat_template(batch_chat_lst,
-                                               add_generation_prompt=True,
-                                               padding=True,
-                                               truncation=True,
-                                               max_length=config.rollout.prompt_length,
-                                               return_tensors='pt',
-                                               return_dict=True,
-                                               tokenize=True)
+                                            add_generation_prompt=True,
+                                            padding=True,
+                                            truncation=True,
+                                            max_length=config.rollout.prompt_length,
+                                            return_tensors='pt',
+                                            return_dict=True,
+                                            tokenize=True)
+
         input_ids = inputs['input_ids']
         attention_mask = inputs['attention_mask']
         position_ids = compute_position_id_with_mask(attention_mask)

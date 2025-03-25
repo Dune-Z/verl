@@ -19,7 +19,7 @@ Each parquet file contains
 """
 
 from typing import List, Union
-
+import numpy as np
 import pandas as pd
 
 import torch
@@ -84,13 +84,13 @@ class SFTDataset(Dataset):
             dataframe = pd.read_parquet(parquet_file)
             dataframes.append(dataframe)
         self.dataframe = pd.concat(dataframes)
-        self.prompts = self.dataframe[self.prompt_key]
-        # if isinstance(self.prompt_key, str):
-        #     self.prompts = self.dataframe[self.prompt_key]
-        # elif isinstance(self.prompt_key, (tuple, list)):
-        #     self.prompts = self.dataframe[self.prompt_key[0]]
-        # else:
-        #     raise NotImplementedError(f'Unknown prompt_key type {self.prompt_key=}')
+        # self.prompts = self.dataframe[self.prompt_key]
+        if isinstance(self.prompt_key, str):
+            self.prompts = self.dataframe[self.prompt_key]
+        elif isinstance(self.prompt_key, (tuple, list)) and len(self.prompt_dict_keys) == 0:
+            self.prompts = self.dataframe[self.prompt_key[0]]
+        else:
+            raise NotImplementedError(f'Unknown prompt_key type {self.prompt_key=}')
         for key in self.prompt_dict_keys:
             # type(x): pandas.core.series.Series
             # type(x[0]): numpy.ndarray
@@ -101,13 +101,13 @@ class SFTDataset(Dataset):
                 print(f'self.prompts={self.prompts}')
                 raise
         self.prompts = self.prompts.tolist()
-        self.responses = self.dataframe[self.response_key]
-        # if isinstance(self.response_key, str):
-        #     self.responses = self.dataframe[self.response_key]
-        # elif isinstance(self.response_key, (tuple, list)):
-        #     self.responses = self.dataframe[self.response_key[0]]
-        # else:
-        #     raise NotImplementedError(f'Unknown response_key type {self.response_key=}') 
+        # self.responses = self.dataframe[self.response_key]
+        if isinstance(self.response_key, str):
+            self.responses = self.dataframe[self.response_key]
+        elif isinstance(self.response_key, (tuple, list)) and len(self.response_dict_keys) == 0:
+            self.responses = self.dataframe[self.response_key[0]]
+        else:
+            raise NotImplementedError(f'Unknown response_key type {self.response_key=}') 
         for key in self.response_dict_keys:
             try:
                 self.responses = self.responses.apply(lambda x: series_to_item(x)[key], axis=1)
@@ -133,10 +133,14 @@ class SFTDataset(Dataset):
         response_chat_str = response + tokenizer.eos_token
 
         # tokenize
+        if isinstance(prompt_chat_str, np.ndarray):
+            prompt_chat_str = prompt_chat_str.tolist()
         prompt_ids_output = tokenizer(prompt_chat_str, return_tensors='pt', add_special_tokens=False)
         prompt_ids = prompt_ids_output['input_ids'][0]
         prompt_attention_mask = prompt_ids_output['attention_mask'][0]
 
+        if isinstance(response_chat_str, np.ndarray):
+            response_chat_str = response_chat_str.tolist()
         response_ids_output = tokenizer(response_chat_str, return_tensors='pt', add_special_tokens=False)
         response_ids = response_ids_output['input_ids'][0]
         response_attention_mask = response_ids_output['attention_mask'][0]
