@@ -271,15 +271,15 @@ class DataParallelPPOActor(BasePPOActor):
                             (data['token_level_scores'].sum(-1) - 1.0) * self.config.sft_loss_exp_coef
                         )
                     reward_rescale = score_original.unsqueeze(1).repeat(1, response_length)
-                    # sft_loss = - self.config.sft_loss_coef * masked_mean(reward_rescale * log_prob, response_mask)
-                    
-                    sft_clip_ratio = self.config.sft_clip_ratio
-                    
-                    negative_approx_kl = log_prob - old_log_prob
-                    ratio = torch.exp(negative_approx_kl)
-                    sft_losses = -reward_rescale * log_prob * ratio
-                    sft_losses2 = -reward_rescale * log_prob * torch.clamp(ratio, 1.0 - sft_clip_ratio, 1.0 + sft_clip_ratio)
-                    sft_loss = self.config.sft_loss_coef * masked_mean(torch.max(sft_losses, sft_losses2), response_mask)
+                    if self.config.sft_clip_ratio <= 0:
+                        sft_loss = - self.config.sft_loss_coef * masked_mean(reward_rescale * log_prob, response_mask)
+                    else:
+                        sft_clip_ratio = self.config.sft_clip_ratio
+                        negative_approx_kl = log_prob - old_log_prob
+                        ratio = torch.exp(negative_approx_kl)
+                        sft_losses = -reward_rescale * log_prob * ratio
+                        sft_losses2 = -reward_rescale * log_prob * torch.clamp(ratio, 1.0 - sft_clip_ratio, 1.0 + sft_clip_ratio)
+                        sft_loss = self.config.sft_loss_coef * masked_mean(torch.max(sft_losses, sft_losses2), response_mask)
 
                     policy_loss = policy_loss + sft_loss
                 if self.config.use_dynamic_bsz:
