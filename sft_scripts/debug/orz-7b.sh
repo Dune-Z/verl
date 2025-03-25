@@ -47,5 +47,7 @@ CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,8 torchrun \
         trainer.default_local_dir=${SAVE_LOCAL_DIR} \
         trainer.total_epochs=4 \
         trainer.logger=['console','wandb'] \
-        optim.lr=1e-6
+        optim.lr=1e-6 \
+        ulysses_sequence_parallel_size=2 \
+        use_remove_padding=true
 

@@ -6,6 +6,7 @@ uv pip install flash_attn --no-build-isolation --link-mode=copy
 uv uninstall wandb
 uv pip install wandb --no-cache-dir --link-mode=copy
 uv pip install math_verify --no-build-isolation --link-mode=copy
+uv pip install transformers==4.47.1 deepspeed
 export HYDRA_FULL_ERROR=1
 export VLLM_ATTENTION_BACKEND=XFORMERS
 export WANDB_API_KEY=d61cd005c38e0e1e27d921c951303410316ac718
@@ -53,4 +54,6 @@ CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 torchrun --standalone --nproc_per_node=8 --
         trainer.default_local_dir=${SAVE_LOCAL_DIR} \
         trainer.total_epochs=4 \
         trainer.logger=['console','wandb'] \
-        optim.lr=1e-6
+        optim.lr=1e-6 \
+        ulysses_sequence_parallel_size=2 \
+        use_remove_padding=true
