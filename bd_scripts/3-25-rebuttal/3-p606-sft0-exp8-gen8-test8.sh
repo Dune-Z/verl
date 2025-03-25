@@ -23,7 +23,7 @@ SAVE_LOCAL_DIR_PREFIX='checkpoints/'
 PROJECT_NAME=Qwen2.5-7B_Mix-Math
 MODEL_NAME=Qwen/Qwen2.5-7B
 EXPERIMENT_NAME=rbt-grpo_${sft_loss_coef}_exp${sft_loss_exp_ceof}_gen_8_test_${SAMPLING_TIME_TEST}_clip_ratio_${sft_clip_ratio}_outer_kl
-SAVE_LOCAL_DIR=/checkpoints/hongpaul-sandbox/r1/${PROJECT_NAME}/${EXPERIMENT_NAME}
+SAVE_LOCAL_DIR=checkpoints/hongpaul-sandbox/r1/${PROJECT_NAME}/${EXPERIMENT_NAME}
 HF_PATH=Yuanxin-Liu/${PROJECT_NAME}-${EXPERIMENT_NAME}
 
 echo "Processing task: math_r1_dataset"
