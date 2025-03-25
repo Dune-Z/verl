@@ -10,6 +10,8 @@ export HYDRA_FULL_ERROR=1
 export WANDB_API_KEY=6f9e1eaf73cd08b4f0cd4674c7856201f2453428
 wandb login --relogin $WANDB_API_KEY
 
+export HF_TOKEN=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
+
 sft_loss_coef=0
 sft_loss_exp_ceof=0
 sft_clip_ratio=0
