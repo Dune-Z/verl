@@ -66,7 +66,6 @@ def main(config):
     wg.init_model()
 
     total_samples = len(dataset)
-    breakpoint()
     # real_batch_size = data.batch['input_ids'].shape[0]
     config_batch_size = config.data.batch_size
     dp_size = wg.world_size // config.rollout.tensor_model_parallel_size

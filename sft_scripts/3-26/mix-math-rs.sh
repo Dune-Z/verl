@@ -15,14 +15,22 @@ export HF_TOKEN=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
 
 PROJECT_NAME=Qwen2.5-7B_Mix-Math-yt
 MODEL_NAME=Qwen/Qwen2.5-7B
-EXPERIMENT_NAME=${MODEL_NAME}-sft-generation
+EXPERIMENT_NAME=${MODEL_NAME}-rs
 SAVE_LOCAL_DIR_PREFIX='checkpoints/'
 SAVE_LOCAL_DIR=${SAVE_LOCAL_DIR_PREFIX}${PROJECT_NAME}/${EXPERIMENT_NAME}
+export HF_PATH=Yuanxin-Liu/${PROJECT_NAME}-${EXPERIMENT_NAME}
+
+python3 data_preprocess/math_r1_dataset.py
+python3 data_preprocess/still_30k.py
+python3 data_preprocess/aime_train_dataset.py
+python3 data_preprocess/create_math_data_mix.py
+python3 data_preprocess/aime_24_dataset.py
+python3 data_preprocess/math_r1_500.py
 
 if [ -d "./data/mix-math" ]; then
     rm -rf ./data/mix-math
 fi
-python3 data_preprocess/create_math_data_mix.py --local_dir data/mix/train.parquet
+python3 data_preprocess/create_math_data_mix.py --local_dir data/mix-math/train.parquet
 
 CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 python3 -m verl.trainer.main_generation \
     trainer.nnodes=1 \
@@ -42,8 +50,8 @@ CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 python3 -m verl.trainer.main_generation \
     rollout.gpu_memory_utilization=0.8
 
 python3 sft_scripts/debug/generation_hub.py --push \
-    --datafiles ./data/orz_dataset/generation.parquet \
-    --hub Ethan-Z/orz-generation-orz
+    --datafiles ./data/mix-math/generation.parquet \
+    --hub Yuanxin-Liu/mix-math-7b-rs
 
 CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 torchrun --standalone --nproc_per_node=8 --nnodes=1 -m verl.trainer.fsdp_sft_trainer \
         data.train_files=./data/orz_dataset/generation.parquet \

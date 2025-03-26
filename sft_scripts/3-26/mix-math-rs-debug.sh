@@ -36,3 +36,4 @@ CUDA_VISIBLE_DEVICES=0,1 python3 -m verl.trainer.main_generation \
     rollout.response_length=8192 \
     rollout.tensor_model_parallel_size=2 \
     rollout.gpu_memory_utilization=0.8
+
