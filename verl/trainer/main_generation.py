@@ -24,7 +24,6 @@ os.environ['TOKENIZERS_PARALLELISM'] = 'true'
 # os.environ['TORCH_COMPILE_DISABLE'] = '1'
 
 from verl.utils.model import compute_position_id_with_mask
-from verl.utils.reward_score.math_r1 import compute_score
 
 import pandas as pd
 

@@ -22,6 +22,8 @@ def create_mixed_dataset(
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--local_dir', default='data/train.parquet')
+    parser.add_argument('--sample_start_idx', type=int, default=0)
+    parser.add_argument('--sample_end_idx', type=int, default=999999999)
     dataset_list = [
         "data/math_r1_dataset/train.parquet",
         "data/aime_train/train.parquet",
@@ -31,6 +33,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     merged_dataset = create_mixed_dataset(dataset_list, copies)
+    merged_dataset = merged_dataset.select(range(args.sample_start_idx, min(args.sample_end_idx, len(merged_dataset))))
     merged_dataset.to_parquet(args.local_dir)
 
 

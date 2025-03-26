@@ -11,7 +11,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     if args.push:
         data = load_dataset('parquet', data_files=args.datafiles)
-        data.push_to_hub(args.hub, private=True)
+        data.push_to_hub(args.hub, private=False)
     else:
         data = load_dataset(args.hub)[args.split]
         data.to_parquet(args.datafiles)
