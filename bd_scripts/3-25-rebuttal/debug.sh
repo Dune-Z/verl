@@ -1,0 +1,80 @@
+export CUDA_VISIBLE_DEVICES=8,9
+#export EXPERIMENT_NAME=qwen-7b-math-606
+export VLLM_ATTENTION_BACKEND=XFORMERS
+export HYDRA_FULL_ERROR=1
+export WANDB_API_KEY=6f9e1eaf73cd08b4f0cd4674c7856201f2453428
+wandb login --relogin $WANDB_API_KEY
+
+export HF_TOKEN=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
+
+sft_loss_coef=0.5
+sft_loss_exp_ceof=12
+sft_clip_ratio=-1
+SAMPLING_TIME_TEST=8
+REMOTE_DATA_PATH=PRIME-RL/Eurus-2-RL-Data
+
+
+SAVE_LOCAL_DIR_PREFIX='checkpoints/'
+PROJECT_NAME=debug
+MODEL_NAME=Qwen/Qwen2.5-0.5B
+EXPERIMENT_NAME=rbt-grpo_${sft_loss_coef}_exp${sft_loss_exp_ceof}_no_ref_gen_8_test_${SAMPLING_TIME_TEST}_clip_ratio_${sft_clip_ratio}_outer_kl
+SAVE_LOCAL_DIR=checkpoints/hongpaul-sandbox/r1/${PROJECT_NAME}/${EXPERIMENT_NAME}
+HF_PATH=Yuanxin-Liu/${PROJECT_NAME}-${EXPERIMENT_NAME}
+
+echo "Processing task: math_r1_dataset"
+python3 data_preprocess/math_r1_dataset.py
+echo "Processing task: still_30k"
+python3 data_preprocess/still_30k.py
+echo "Processing task: aime_train_dataset"
+python3 data_preprocess/aime_train_dataset.py
+echo "Processing task: create_math_data_mix"
+python3 data_preprocess/create_math_data_mix.py
+echo "Processing task: aime_24_dataset"
+python3 data_preprocess/aime_24_dataset.py
+echo "Processing task: math_r1_500"
+python3 data_preprocess/math_r1_500.py
+
+echo "start training"
+python3 -m verl.trainer.main_ppo \
+        actor_rollout_ref.actor.sft_loss_coef=${sft_loss_coef} \
+        actor_rollout_ref.actor.sft_loss_exp_coef=${sft_loss_exp_ceof} \
+        actor_rollout_ref.actor.sft_clip_ratio=${sft_clip_ratio} \
+        actor_rollout_ref.actor.ref_in_kl=False \
+        algorithm.adv_estimator=grpo \
+        algorithm.kl_ctrl.kl_coef=0 \
+        trainer.test_sample_n=${SAMPLING_TIME_TEST} \
+        data.custom_temp_dir=$HOME/tmp/ray/  \
+        data.train_files=data/train.parquet \
+        data.val_files=['data/aime_2024/test.parquet','data/math_r1_500/test.parquet'] \
+        data.train_batch_size=512 \
+        data.val_batch_size=256 \
+        data.max_prompt_length=512 \
+        data.max_response_length=32 \
+        actor_rollout_ref.model.path=$MODEL_NAME \
+        actor_rollout_ref.actor.optim.lr=1e-6 \
+        actor_rollout_ref.model.use_remove_padding=True \
+        actor_rollout_ref.actor.ppo_mini_batch_size=256 \
+        actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=4 \
+        actor_rollout_ref.actor.use_kl_loss=True \
+        actor_rollout_ref.actor.kl_loss_coef=0.001 \
+        actor_rollout_ref.actor.kl_loss_type=low_var_kl \
+        actor_rollout_ref.model.enable_gradient_checkpointing=True \
+        actor_rollout_ref.actor.fsdp_config.param_offload=False \
+        actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=32 \
+        actor_rollout_ref.rollout.tensor_model_parallel_size=1 \
+        actor_rollout_ref.rollout.gpu_memory_utilization=0.6 \
+        actor_rollout_ref.rollout.n=1 \
+        actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=32 \
+        actor_rollout_ref.ref.fsdp_config.param_offload=True \
+        trainer.logger=['console','wandb'] \
+        trainer.default_hdfs_dir=null \
+        trainer.project_name=${PROJECT_NAME} \
+        trainer.experiment_name=${EXPERIMENT_NAME} \
+        trainer.default_local_dir=${SAVE_LOCAL_DIR} \
+        trainer.n_gpus_per_node=2 \
+        trainer.nnodes=1 \
+        trainer.save_freq=80 \
+        trainer.test_freq=20 \
+        trainer.total_epochs=3 $@
+
+#python3 scripts/model_merger.py --local_dir ${SAVE_LOCAL_DIR} --get_last --hf_upload_path ${HF_PATH}

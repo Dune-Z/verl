@@ -207,7 +207,7 @@ class DataParallelPPOActor(BasePPOActor):
         temperature = data.meta_info['temperature']  # temperature must be in the data.meta_info to avoid slient error
 
         select_keys = ['responses', 'input_ids', 'attention_mask', 'position_ids', 'old_log_probs', 'advantages', 'token_level_scores']
-        if self.config.use_kl_loss:
+        if self.config.use_kl_loss and self.config.get('ref_in_kl', True):
             select_keys.append('ref_log_prob')
         batch = data.select(batch_keys=select_keys).batch
 
@@ -256,7 +256,10 @@ class DataParallelPPOActor(BasePPOActor):
                 policy_loss = pg_loss - entropy_loss * entropy_coeff
 
                 if self.config.use_kl_loss:
-                    ref_log_prob = data['ref_log_prob']
+                    if self.config.get('ref_in_kl', True):
+                        ref_log_prob = data['ref_log_prob']
+                    else:
+                        ref_log_prob = data['old_log_probs']
                     # compute kl loss
                     kld = core_algos.kl_penalty(logprob=log_prob,
                                                 ref_logprob=ref_log_prob,
