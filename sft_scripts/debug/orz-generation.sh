@@ -9,9 +9,9 @@ MODEL_NAME=Open-Reasoner-Zero/Open-Reasoner-Zero-7B
 rm -rf ./data/orz_dataset
 python3 data_preprocess/orz_dataset.py --local_dir ./data/orz_dataset --sample_start_idx 0 --sample_end_idx 128
 
-CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,8 python3 -m verl.trainer.main_generation \
+CUDA_VISIBLE_DEVICES=0 python3 -m verl.trainer.main_generation \
     trainer.nnodes=1 \
-    trainer.n_gpus_per_node=8 \
+    trainer.n_gpus_per_node=1 \
     data.path=./data/orz_dataset/train.parquet \
     data.prompt_key=prompt \
     data.n_samples=1 \

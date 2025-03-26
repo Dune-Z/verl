@@ -24,6 +24,7 @@ os.environ['TOKENIZERS_PARALLELISM'] = 'true'
 # os.environ['TORCH_COMPILE_DISABLE'] = '1'
 
 from verl.utils.model import compute_position_id_with_mask
+from verl.utils.reward_score.math_r1 import compute_score
 
 import pandas as pd
 
@@ -65,6 +66,7 @@ def main(config):
     wg.init_model()
 
     total_samples = len(dataset)
+    breakpoint()
     # real_batch_size = data.batch['input_ids'].shape[0]
     config_batch_size = config.data.batch_size
     dp_size = wg.world_size // config.rollout.tensor_model_parallel_size
