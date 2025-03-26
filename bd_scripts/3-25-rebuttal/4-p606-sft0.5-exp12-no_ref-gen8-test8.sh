@@ -45,7 +45,7 @@ python3 -m verl.trainer.main_ppo \
         actor_rollout_ref.actor.sft_loss_exp_coef=${sft_loss_exp_ceof} \
         actor_rollout_ref.actor.sft_clip_ratio=${sft_clip_ratio} \
         actor_rollout_ref.actor.ref_in_kl=False \
-        algorithm.kl_ctrl.kl_coef=0.001 \
+        algorithm.kl_ctrl.kl_coef=0 \
         algorithm.adv_estimator=grpo \
         trainer.test_sample_n=${SAMPLING_TIME_TEST} \
         data.custom_temp_dir=$HOME/tmp/ray/  \
