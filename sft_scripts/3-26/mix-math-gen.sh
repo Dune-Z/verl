@@ -47,4 +47,4 @@ CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 python3 -m verl.trainer.main_generation \
 
 python3 sft_scripts/debug/generation_hub.py --push \
     --datafiles ./data/mix-math/generation.parquet \
-    --hub Yuanxin-Liu/mix-math-7b-${MODEL_NAME}-rs
+    --hub Yuanxin-Liu/mix-math-7b-Qwen-rs
