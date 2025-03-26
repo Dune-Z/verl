@@ -25,7 +25,7 @@ python3 data_preprocess/math_r1_500.py
 if [ -d "./data/mix-math" ]; then
     rm -rf ./data/mix-math
 fi
-python3 data_preprocess/create_math_data_mix.py --local_dir data/mix-math/train.parquet --sample_start_idx 0 --sample_end_idx 128
+python3 data_preprocess/create_math_data_mix.py --local_dir data/mix-math/train.parquet
 
 
 CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 python3 -m verl.trainer.main_generation \
@@ -47,4 +47,4 @@ CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 python3 -m verl.trainer.main_generation \
 
 python3 sft_scripts/debug/generation_hub.py --push \
     --datafiles ./data/mix-math/generation.parquet \
-    --hub Yuanxin-Liu/mix-math-7b-rs
+    --hub Yuanxin-Liu/mix-math-7b-${MODEL_NAME}-rs
