@@ -69,7 +69,9 @@ def main(config):
     # real_batch_size = data.batch['input_ids'].shape[0]
     config_batch_size = config.data.batch_size
     dp_size = wg.world_size // config.rollout.tensor_model_parallel_size
-    num_batch = -(-total_samples // config_batch_size)
+    num_batch = total_samples // config_batch_size
+    # only select the first num_batch * config_batch_size samples
+    dataset = dataset[:num_batch * config_batch_size]
     output_lst = [[] for _ in range(config.data.n_samples)]
 
     for batch_idx in range(num_batch):

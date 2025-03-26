@@ -17,7 +17,7 @@ if [ -d "./data/mix-math" ]; then
     rm -rf ./data/mix-math
 fi
 python3 data_preprocess/create_math_data_mix.py --local_dir data/mix/train.parquet
-python3 data_preprocess/orz_dataset.py --local_dir ./data/orz_dataset --sample_start_idx 0 --sample_end_idx 128
+python3 data_preprocess/orz_dataset.py --local_dir ./data/orz_dataset --sample_start_idx 0 --sample_end_idx 129
 
 
 CUDA_VISIBLE_DEVICES=0,1 python3 -m verl.trainer.main_generation \
