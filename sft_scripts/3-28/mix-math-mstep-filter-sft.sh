@@ -15,12 +15,12 @@ export HF_PATH=Yuanxin-Liu/${PROJECT_NAME}-${EXPERIMENT_NAME}
 #     --hub Yuanxin-Liu/mix-math-7b-Qwen-rs
 
 python3 -m verl.trainer.main_filter \
-    --datafiles ./data/mix-math/filtered.parquet \
-    --output_files ./data/mix-math/generation-filtered.parquet
+    --datafiles ./data/mix-math-emodel/generation.parquet \
+    --output_files ./data/mix-math-emodel/generation-filtered.parquet
 
 CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 torchrun --standalone --nproc_per_node=8 --nnodes=1 -m verl.trainer.fsdp_sft_trainer \
-        data.train_files=./data/mix-math/generation-filtered.parquet \
-        data.val_files=./data/mix-math/generation-filtered.parquet \
+        data.train_files=./data/mix-math-emodel/generation-filtered.parquet \
+        data.val_files=./data/mix-math-emodel/generation-filtered.parquet \
         data.prompt_key=prompt \
         data.response_key=responses \
         data.train_batch_size=8 \
