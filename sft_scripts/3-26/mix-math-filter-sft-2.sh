@@ -36,4 +36,4 @@ CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 torchrun --standalone --nproc_per_node=8 --
         optim.lr=1e-6 \
         ulysses_sequence_parallel_size=2 \
         use_remove_padding=true \
-        trainer.hub_model_id=Yuanxin-Liu/baseline-rs-epoch1
+        trainer.hub_model_id=Yuanxin-Liu/baseline-rs-epoch2
