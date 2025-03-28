@@ -1,12 +1,12 @@
 set -x
-wget -qO- https://astral.sh/uv/install.sh | sh
-uv venv briter --python 3.11 && source briter/bin/activate && uv pip install --upgrade pip --link-mode=copy
-uv pip install -r requirements.txt --link-mode=copy
-uv pip install flash_attn --no-build-isolation --link-mode=copy
-uv uninstall wandb
-uv pip install wandb --no-cache-dir --link-mode=copy
-uv pip install math_verify --no-build-isolation --link-mode=copy
-uv pip install transformers==4.47.1 deepspeed
+# wget -qO- https://astral.sh/uv/install.sh | sh
+# uv venv briter --python 3.11 && source briter/bin/activate && uv pip install --upgrade pip --link-mode=copy
+# uv pip install -r requirements.txt --link-mode=copy
+# uv pip install flash_attn --no-build-isolation --link-mode=copy
+# uv uninstall wandb
+# uv pip install wandb --no-cache-dir --link-mode=copy
+# uv pip install math_verify --no-build-isolation --link-mode=copy
+# uv pip install transformers==4.47.1 deepspeed
 export HYDRA_FULL_ERROR=1
 export VLLM_ATTENTION_BACKEND=XFORMERS
 export WANDB_API_KEY=d61cd005c38e0e1e27d921c951303410316ac718
@@ -27,7 +27,6 @@ if [ -d "./data/mix-math" ]; then
     rm -rf ./data/mix-math
 fi
 python3 data_preprocess/create_math_data_mix.py --local_dir data/mix-math/train.parquet --sample_start_idx 0 --sample_end_idx 1024
-
 
 CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 python3 -m verl.trainer.main_generation \
     trainer.nnodes=1 \

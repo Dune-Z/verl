@@ -34,6 +34,7 @@ if __name__ == "__main__":
 
     merged_dataset = create_mixed_dataset(dataset_list, copies)
     merged_dataset = merged_dataset.select(range(args.sample_start_idx, min(args.sample_end_idx, len(merged_dataset))))
+    print(f"Length of the dataset: {len(merged_dataset)}")
     merged_dataset.to_parquet(args.local_dir)
 
 
