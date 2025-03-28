@@ -527,16 +527,6 @@ def main(config):
                                            mesh_dim_names=('dp', 'sp'))
     trainer = FSDPSFTTrainer(config=config, device_mesh=device_mesh, ulysses_device_mesh=ulysses_device_mesh)
     trainer.fit()
-    # push model to hub
-    if rank == 0:
-        trainer.model.push_to_hub(trainer.config.trainer.hub_model_id,
-                                   commit_message=f'global_step_{trainer.total_training_steps}',
-                                   blocking=True,
-                                   auto_lfs_prune=True)
-        trainer.tokenizer.push_to_hub(trainer.config.trainer.hub_model_id,
-                                      commit_message=f'global_step_{trainer.total_training_steps}',
-                                      blocking=True,
-                                      auto_lfs_prune=True)
 
 
 if __name__ == '__main__':

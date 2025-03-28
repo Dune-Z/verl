@@ -30,4 +30,4 @@ CUDA_VISIBLE_DEVICES=8,9 torchrun --standalone --nproc_per_node=2 --nnodes=1 -m 
         optim.lr=1e-6 \
         ulysses_sequence_parallel_size=2 \
         use_remove_padding=true \
-        trainer.hub_model_id=Yuanxin-Liu/baseline-rs-debug
+        trainer.hub_model_id=Yuanxin-Liu/baseline-rs-debug-lora
