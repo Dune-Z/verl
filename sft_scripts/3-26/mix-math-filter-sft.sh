@@ -1,7 +1,7 @@
 set -x
 source briter/bin/activate
 export HF_TOKEN=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
-export WANDB_API_KEY=6f9e1eaf73cd08b4f0cd4674c7856201f2453428
+export WANDB_API_KEY=d61cd005c38e0e1e27d921c951303410316ac718
 wandb login --relogin $WANDB_API_KEY
 MODEL_NAME=Qwen/Qwen2.5-7B
 PROJECT_NAME=Qwen2.5-7B_Mix-Math-yt
@@ -35,4 +35,5 @@ CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 torchrun --standalone --nproc_per_node=8 --
         trainer.logger=['console','wandb'] \
         optim.lr=1e-6 \
         ulysses_sequence_parallel_size=2 \
-        use_remove_padding=true
+        use_remove_padding=true \
+        trainer.hub_model_id=Yuanxin-Liu/baseline-rs
