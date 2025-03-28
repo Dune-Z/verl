@@ -1,4 +1,5 @@
 set -x
+source briter/bin/activate
 export HF_TOKEN=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
 export WANDB_API_KEY=6f9e1eaf73cd08b4f0cd4674c7856201f2453428
 wandb login --relogin $WANDB_API_KEY
@@ -14,7 +15,7 @@ export HF_PATH=Yuanxin-Liu/${PROJECT_NAME}-${EXPERIMENT_NAME}
 #     --hub Yuanxin-Liu/mix-math-7b-Qwen-rs
 
 python3 -m verl.trainer.main_filter \
-    --datafiles ./data/mix-math/filtered.parquet \
+    --datafiles ./data/mix-math/generation.parquet \
     --output_files ./data/mix-math/generation-filtered.parquet
 
 CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 torchrun --standalone --nproc_per_node=8 --nnodes=1 -m verl.trainer.fsdp_sft_trainer \
