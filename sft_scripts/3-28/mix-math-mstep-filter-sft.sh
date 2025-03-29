@@ -18,9 +18,9 @@ SAVE_LOCAL_DIR_PREFIX='checkpoints/'
 SAVE_LOCAL_DIR=${SAVE_LOCAL_DIR_PREFIX}${PROJECT_NAME}/${EXPERIMENT_NAME}
 export HF_PATH=Yuanxin-Liu/${PROJECT_NAME}-${EXPERIMENT_NAME}
 
-# python3 sft_scripts/debug/generation_hub.py \
-#     --datafiles ./data/mix-math/generation.parquet \
-#     --hub Yuanxin-Liu/mix-math-7b-Qwen-rs
+python3 sft_scripts/debug/generation_hub.py \
+    --datafiles ./data/mix-math-emodel/generation.parquet \
+    --hub Yuanxin-Liu/mix-math-7b-emodel-rs
 
 python3 -m verl.trainer.main_filter \
     --datafiles ./data/mix-math-emodel/generation.parquet \
@@ -43,5 +43,16 @@ CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 torchrun --standalone --nproc_per_node=8 --
         trainer.logger=['console','wandb'] \
         optim.lr=1e-6 \
         ulysses_sequence_parallel_size=2 \
-        use_remove_padding=true \
-        trainer.hub_model_id=Yuanxin-Liu/estep-rs
+        use_remove_padding=true
+
+for CHECKPOINT in ${SAVE_LOCAL_DIR}/global_step_*; do
+    STEP=$(basename $CHECKPOINT)  # Extracts "global_step_X"
+    HUB_MODEL_ID="Yuanxin-Liu/estep-rs-epoch4-step-${STEP}"
+
+    echo "Pushing checkpoint: $STEP to Hugging Face Hub at $HUB_MODEL_ID"
+
+    python sft_scripts/3-26/push_to_hub.py \
+        --model_name_or_path ${MODEL_NAME} \
+        --adapter_path ${CHECKPOINT} \
+        --hub_model_id ${HUB_MODEL_ID}
+done
